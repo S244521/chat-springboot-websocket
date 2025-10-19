@@ -102,6 +102,6 @@ public class RootController {
         if (username == null) {
             return Result.error("token 无效");
         }
-        return userService.removeById(id) ? Result.ok() : Result.error("删除失败");
+        return userService.removeById(id) ? Result.ok("删除成功") : Result.error("删除失败");
     }
 }
