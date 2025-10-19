@@ -11,8 +11,8 @@ import java.util.Date;
 /**
  * WebSocket 定时任务，用于演示后端主动推消息
  */
-@Component
-@EnableScheduling
+//@Component
+//@EnableScheduling
 @Slf4j
 public class WebSocketTask {
 

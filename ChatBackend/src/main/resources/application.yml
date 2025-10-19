@@ -10,13 +10,10 @@ spring:
 #      password:
 
   datasource:
-    dynamic:
-      datasource:
-        master:
-          driver-class-name: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://localhost:3306/springboot_demo?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8
-          username: root
-          password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/chat
+      username: root
+      password: root
 
 mybatis-plus:
     mapper-locations: classpath:mapper/*.xml
