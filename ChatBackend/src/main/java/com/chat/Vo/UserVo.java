@@ -1,4 +1,5 @@
-package com.chat.entity;
+package com.chat.Vo;
+
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -9,19 +10,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@TableName("history")
 @JsonIgnoreProperties(ignoreUnknown = true) // 忽略JSON中未知的字段
-public class HistoryEntity {
-    @TableId(type = IdType.AUTO)
-    private Integer id;// 聊天记录id
-    private Integer userid;// 用户id
-    private String conversationid;// 会话id
-    private String text;// 聊天记录
-    private LocalDateTime createtime;// 发送时间
+public class UserVo {
+    private Integer id;// 用户id
+    private String username;// 用户名
+    private String name;// 昵称
+    private Integer sex;// 性别 0:男 1:女 2:未知
 }

@@ -11,15 +11,15 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@Data
+
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @TableName("conversation")
 @JsonIgnoreProperties(ignoreUnknown = true) // 忽略JSON中未知的字段
+@Data
 public class ConversationEntity {
-    @TableId(type = IdType.AUTO)
-    private Integer id;// 会话机制id
+    private String id;// 会话机制id
     private Integer type;// 会话类别 0:私聊 1:群聊
     private String conversation;// 会话人id '1,2,3'
 }

@@ -1,6 +1,8 @@
 package com.chat.controller;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chat.Vo.UserVo;
 import com.chat.entity.UserEntity;
 import com.chat.service.UserService;
 import com.chat.common.Result;
@@ -141,4 +143,41 @@ public class UserController {
         }
         return Result.error("注销失败");
     }
+
+    /**
+     * 查询用户
+     * @param authorizationHeader
+     * @param pageNum
+     * @param pageSize
+     */
+    @GetMapping("/selectUser")
+    public Result<?> selectUser(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestHeader(value = "Shang", required = false) String Shang,
+            // 接收分页参数，默认页码1，每页10条
+            @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "key", required = false, defaultValue = "") String key
+    ){
+        if (Shang != null){
+            authorizationHeader = "Bearer "+authorizationHeader.substring(6);
+        }
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Shang ")) {
+            return Result.error("Authorization 头格式错误");
+        }
+        String token = authorizationHeader.substring(6);
+
+        if (JwtUtils.isTokenExpired(token)) {
+            return Result.error("token 已过期，请重新登录"); // 明确提示“过期”，比“无效”更精准
+        }
+
+        String username = JwtUtils.parseUsername(token);
+        if (username == null) {
+            return Result.error("token 无效");
+        }
+
+        Page<UserVo> allUser = userService.getAllUser(pageNum, pageSize, key);
+        return Result.ok(allUser);
+    }
+
 }
