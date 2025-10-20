@@ -1,11 +1,8 @@
 <script setup>
-	import CodeRain from './components/CodeRain.vue';
-	import Chat from './components/Chat.vue';
 </script>
 
 <template>
-	<CodeRain/>
-	<Chat/>
+	<router-view></router-view>
 </template>
 
 <style scoped>
