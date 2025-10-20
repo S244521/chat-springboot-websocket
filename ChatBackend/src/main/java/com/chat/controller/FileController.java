@@ -73,19 +73,9 @@ public class FileController {
         @RequestParam("originalFilename") String originalFilename,
         @RequestHeader("Authorization") String authorizationHeader
     ){
-        // 校验 token（保持原有逻辑）
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return Result.error("Authorization 头格式错误");
-        }
-        String token = authorizationHeader.substring(7);
-
-        if (JwtUtils.isTokenExpired(token)) {
-            return Result.error("token 已过期，请重新登录"); // 明确提示“过期”，比“无效”更精准
-        }
-
-        String username = JwtUtils.parseUsername(token);
-        if (username == null) {
-            return Result.error("token 无效");
+        String verifyToken = JwtUtils.verifyToken(authorizationHeader);
+        if(verifyToken!=null){
+            return Result.error(verifyToken);
         }
 
         // 在实际调用服务前，可以添加 fileStorageService.init() 的检查，
@@ -218,19 +208,9 @@ public class FileController {
         @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
         @RequestBody FileQuery fileQuery
     ) {
-        // 校验 token（保持原有逻辑）
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return Result.error("Authorization 头格式错误");
-        }
-        String token = authorizationHeader.substring(7);
-
-        if (JwtUtils.isTokenExpired(token)) {
-            return Result.error("token 已过期，请重新登录"); // 明确提示“过期”，比“无效”更精准
-        }
-
-        String username = JwtUtils.parseUsername(token);
-        if (username == null) {
-            return Result.error("token 无效");
+        String verifyToken = JwtUtils.verifyToken(authorizationHeader);
+        if(verifyToken!=null){
+            return Result.error(verifyToken);
         }
         Page<FileEntity> query = fileService.query(pageNum, pageSize, fileQuery);
         return Result.ok(query);

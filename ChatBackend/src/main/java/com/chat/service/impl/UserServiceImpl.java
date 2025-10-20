@@ -17,6 +17,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     public Page<UserVo> getAllUser(Integer pageNum, Integer pageSize, String key) {
         Page<UserEntity> page = new Page<>(pageNum, pageSize);
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
+        System.out.println("key: "+key);
         if (key != null) {
             queryWrapper.like("username", key)
                     .or() // 表示“或”关系

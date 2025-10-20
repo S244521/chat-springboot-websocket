@@ -17,6 +17,11 @@ spring:
       url: jdbc:mysql://localhost:3306/chat
       username: root
       password: root
+# 只启用conversationTask定时任务
+task:
+  enable:
+    conversation: true  # 需要启动的任务
+    other: false        # 其他任务禁用
 
 mybatis-plus:
     mapper-locations: classpath:mapper/*.xml

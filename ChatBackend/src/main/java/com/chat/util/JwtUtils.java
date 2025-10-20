@@ -1,5 +1,6 @@
 package com.chat.util;
 
+import com.chat.common.Result;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 
@@ -89,6 +90,27 @@ public class JwtUtils {
         } catch (ExpiredJwtException e) {
             return true;
         }
+    }
+
+    /**
+     * 校验
+     */
+    public static String verifyToken(String authorizationHeader) {
+        // 校验 token（保持原有逻辑）
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return "Authorization 头格式错误";
+        }
+        String token = authorizationHeader.substring(7);
+
+        if (JwtUtils.isTokenExpired(token)) {
+            return "token 已过期，请重新登录"; // 明确提示“过期”，比“无效”更精准
+        }
+
+        String username = JwtUtils.parseUsername(token);
+        if (username == null) {
+            return "token 无效";
+        }
+        return null;
     }
     public static void main(String[] args) {
         // 获取当前时间

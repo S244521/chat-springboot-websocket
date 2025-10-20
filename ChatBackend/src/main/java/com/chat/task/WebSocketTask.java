@@ -1,6 +1,7 @@
-package com.chat.components;
+package com.chat.task;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -11,8 +12,8 @@ import java.util.Date;
 /**
  * WebSocket 定时任务，用于演示后端主动推消息
  */
-//@Component
-//@EnableScheduling
+@Component
+@ConditionalOnProperty(name = "task.enable.other", havingValue = "true")
 @Slf4j
 public class WebSocketTask {
 

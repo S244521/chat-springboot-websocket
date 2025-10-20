@@ -82,19 +82,9 @@ public class UserController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody UserEntity user)
     {
-        // 校验 token（保持原有逻辑）
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            return Result.error("Authorization 头格式错误");
-        }
-        String tokenToken = authorizationHeader.substring(7);
-
-        if (JwtUtils.isTokenExpired(tokenToken)) {
-            return Result.error("token 已过期，请重新登录"); // 明确提示“过期”，比“无效”更精准
-        }
-
-        String usernameToken = JwtUtils.parseUsername(tokenToken);
-        if (usernameToken == null) {
-            return Result.error("token 无效");
+        String verifyToken = JwtUtils.verifyToken(authorizationHeader);
+        if(verifyToken!=null){
+            return Result.error(verifyToken);
         }
 
         String username = StringUtil.xssFilter(user.getUsername());
@@ -162,18 +152,9 @@ public class UserController {
         if (Shang != null){
             authorizationHeader = "Bearer "+authorizationHeader.substring(6);
         }
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Shang ")) {
-            return Result.error("Authorization 头格式错误");
-        }
-        String token = authorizationHeader.substring(6);
-
-        if (JwtUtils.isTokenExpired(token)) {
-            return Result.error("token 已过期，请重新登录"); // 明确提示“过期”，比“无效”更精准
-        }
-
-        String username = JwtUtils.parseUsername(token);
-        if (username == null) {
-            return Result.error("token 无效");
+        String verifyToken = JwtUtils.verifyToken(authorizationHeader);
+        if(verifyToken!=null){
+            return Result.error(verifyToken);
         }
 
         Page<UserVo> allUser = userService.getAllUser(pageNum, pageSize, key);
