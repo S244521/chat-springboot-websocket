@@ -5,19 +5,20 @@
 			<!-- 左侧聊天列表面板 -->
 			<aside class="chat-list-panel">
 				<div class="search-bar">
-					<span class="search-icon">🔍</span>
-					<input type="text" placeholder="搜索..." />
+					<span class="search-icon" @click="search()">🔍</span>
+					<input type="text" placeholder="搜索..." v-model="key"/>
 				</div>
 				<ul class="chat-list">
 					<li v-for="chat in chatListItems" :key="chat.id" class="chat-list-item"
 						:class="{ active: selectedChat && selectedChat.id === chat.id }" @click="selectChat(chat)">
-						<img :src="chat.avatar" alt="avatar" class="avatar" />
+						<!-- <img :src="chat.avatar" alt="avatar" class="avatar" /> -->
 						<div class="chat-info">
 							<div class="chat-info-header">
 								<span class="chat-name">{{ chat.name }}</span>
 								<span class="chat-timestamp">{{ chat.timestamp }}</span>
 							</div>
-							<p class="last-message">{{ chat.lastMessage }}</p>
+							<span class="search-icon" style="font-size: 24px;" @click.stop="deleteById(chat.id)">🗑</span>	
+							<!-- <p class="last-message">{{ chat.lastMessage }}</p> -->
 						</div>
 					</li>
 				</ul>
@@ -80,12 +81,18 @@
 
 <script setup>
 	import {
-		ref
+		ref,
+		onMounted
 	} from 'vue';
-
+	import api from '../util/request';
+	import {
+		useRouter
+	} from 'vue-router';
+	
+	
 	// --- 状态管理 ---
 	const showAttachments = ref(false);
-
+	
 	// 模拟的聊天列表数据
 	const chatListItems = ref([{
 			id: 1,
@@ -94,42 +101,10 @@
 			lastMessage: '自己 fonnan mestag...',
 			timestamp: '9:05',
 			members: '聊天室 成员数'
-		},
-		{
-			id: 2,
-			name: '眠呢',
-			avatar: 'https://i.pravatar.cc/40?u=b',
-			lastMessage: '好的，没问题！',
-			timestamp: '昨天',
-			members: '在线'
-		},
-		{
-			id: 3,
-			name: '咱人',
-			avatar: 'https://i.pravatar.cc/40?u=c',
-			lastMessage: '你好！Vue 3 真棒！',
-			timestamp: '星期三',
-			members: '离线'
-		},
-		{
-			id: 4,
-			name: 'UI/UX 设计交流群',
-			avatar: 'https://i.pravatar.cc/40?u=group2',
-			lastMessage: '这个霓虹灯效果怎么实现的？',
-			timestamp: '15:30',
-			members: '128 人在线'
-		},
+		}
 	]);
-
-	// 当前选中的聊天，默认为第一个
-	const selectedChat = ref(chatListItems.value[0]);
-
-	// 点击切换聊天的函数
-	const selectChat = (chat) => {
-		selectedChat.value = chat;
-	};
-
-
+	const key=ref("");
+	
 	// 模拟的聊天消息数据 (实际项目中应根据 selectedChat 动态加载)
 	const messages = ref([{
 			id: 1,
@@ -172,6 +147,62 @@
 			timestamp: '2024 45:45'
 		},
 	]);
+	
+	
+	
+	
+
+
+
+	// 初始化聊天列表，TODO 初始化实时查询数据
+	const chatlist = () => {
+		api({
+			url: '/conversation/getself',
+			method: 'get'
+		}).then(response => {
+			console.log(response)
+			chatListItems.value=response;
+			console.log(chatListItems.value)
+		}).catch(error => {
+			// 失败处理
+			console.error('获取聊天列表失败:', error)
+			alert('获取聊天列表失败: ' + (error.msg || error.message || '未知错误'))
+		})
+	}
+
+	// 当前选中的聊天，默认为第一个
+	const selectedChat = ref(chatListItems.value[0]);
+
+	// 点击切换聊天的函数
+	const selectChat = (chat) => {
+		selectedChat.value = chat;
+	};
+	
+	// 退出会话
+	const deleteById = (id) => {
+		api({
+			url: '/conversation/leave',
+			method: 'post',
+			params:{
+				id:id
+			}
+		}).then(response => {
+			console.log(response)
+		}).catch(error => {
+			// 失败处理
+			console.error('删除会话失败:', error)
+			alert('删除会话失败: ' + (error.msg || error.message || '未知错误'))
+		})
+	}
+
+	// 实时查询
+	const search =()=> {
+		alert(key.value)
+	}
+	
+	
+	// 注册 mounted 钩子，DOM 挂载后自动执行
+	onMounted(chatlist);
 </script>
 
 <style scoped>
@@ -232,6 +263,7 @@
 
 	.search-icon {
 		color: var(--glow-cyan);
+		cursor: pointer;
 	}
 
 	.search-bar input {
@@ -284,10 +316,13 @@
 
 	.chat-info {
 		width: 100%;
+		display: flex;
+		justify-content: space-between;
 		overflow: hidden;
 	}
 
 	.chat-info-header {
+		width: 70%;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;

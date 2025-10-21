@@ -67,8 +67,10 @@
 		ref
 	} from 'vue';
 	import api from '../util/request';
-	import { useRouter } from 'vue-router';
-	
+	import {
+		useRouter
+	} from 'vue-router';
+
 	// 创建路由实例
 	const router = useRouter();
 
@@ -98,15 +100,19 @@
 	}
 
 	const login = () => {
-		api.login({
-				username: loginusername.value,
-				password: loginpassword.value
+		api({
+				url: '/user/login',
+				method: 'post',
+				data: {
+					username: loginusername.value,
+					password: loginpassword.value
+				}
 			}).then(response => {
 				// 成功处理
 				console.log('登录成功:', response)
 				if (response.token) {
-					sessionStorage.setItem("user",response);
-					localStorage.setItem('token', "Bearer "+response.token)
+					sessionStorage.setItem("user", response);
+					localStorage.setItem('token', "Bearer " + response.token)
 					router.push('/Chat');
 				}
 			})
@@ -117,7 +123,29 @@
 			})
 	}
 	const sign = () => {
-		alert(signusername.value + signpassword.value + signname.value + signsex.value)
+		api({
+				url: '/user/sign',
+				method: 'post',
+				data: {
+					username: signusername.value,
+					password: signpassword.value,
+					name: signname.value,
+					sex: signsex.value
+				}
+			}).then(response => {
+				// 成功处理
+				console.log('注册成功:', response)
+				if (response.token) {
+					sessionStorage.setItem("user", response);
+					localStorage.setItem('token', "Bearer " + response.token)
+					router.push('/Chat');
+				}
+			})
+			.catch(error => {
+				// 失败处理
+				console.error('注册失败:', error)
+				alert('注册失败: ' + (error.msg || error.message || '未知错误'))
+			})
 	}
 </script>
 

@@ -157,7 +157,7 @@ public class UserController {
             return Result.error(verifyToken);
         }
 
-        Page<UserVo> allUser = userService.getAllUser(pageNum, pageSize, key);
+        Page<UserVo> allUser = userService.getAllUser(pageNum, pageSize, key, null);
         return Result.ok(allUser);
     }
 

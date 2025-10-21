@@ -1,5 +1,6 @@
 package com.chat.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,11 +11,12 @@ import com.chat.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> implements UserService {
     @Override
-    public Page<UserVo> getAllUser(Integer pageNum, Integer pageSize, String key) {
+    public Page<UserVo> getAllUser(Integer pageNum, Integer pageSize, String key,Integer id) {
         Page<UserEntity> page = new Page<>(pageNum, pageSize);
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
         System.out.println("key: "+key);
@@ -22,6 +24,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
             queryWrapper.like("username", key)
                     .or() // 表示“或”关系
                     .like("name", key);
+        }
+        if (id != null){
+            queryWrapper.eq("id", id);
         }
         Page<UserEntity> userEntityPage = this.page(page,queryWrapper);
         // 创建一个UserVoPage对象，将userEntityPage中的数据复制到userVoPage中
@@ -42,5 +47,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         userVoPage.setRecords(userVos);
 
         return userVoPage;
+    }
+
+    @Override
+    public List<UserVo> getUserList(Set<Integer> ids) {
+        List<UserEntity> list = this.listByIds(ids);
+        return list.stream().map(userEntity -> {
+            UserVo userVo = new UserVo();
+            userVo.setId(userEntity.getId());
+            userVo.setUsername(userEntity.getUsername());
+            userVo.setName(userEntity.getName());
+            userVo.setSex(userEntity.getSex());
+            return userVo;
+        }).toList();
     }
 }

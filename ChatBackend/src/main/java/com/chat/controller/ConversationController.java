@@ -184,7 +184,7 @@ public class ConversationController {
     @PostMapping("/leave")
     public Result<?> leaveConversation(
             @RequestHeader("Authorization") String authorizationHeader,
-            @RequestParam String conversationId
+            @RequestParam("id") String conversationId
     ) {
         // 校验 token（保持原有逻辑）
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
@@ -225,6 +225,8 @@ public class ConversationController {
 
             // 3. 手动提交事务（提交后再释放锁）
             transactionManager.commit(status);
+
+            // TODO 删除redis会话
             return Result.ok("退出成功");
         } catch (Exception e){
             transactionManager.rollback(status);
@@ -263,33 +265,20 @@ public class ConversationController {
         String userIdStr = userIntId.toString(); // 转换为字符串，用于模糊查询
 
         // 先查询redis缓存
-        List<ConversationEntity> cachedConversationList = (List<ConversationEntity>) redisTemplate.opsForValue().get("conversation:" + userId+":"+username);
+        List<ConversationVo> cachedConversationList = (List<ConversationVo>) redisTemplate.opsForValue().get("conversation:" + userId+":"+username);
         if(cachedConversationList != null){
             redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
             return Result.ok(cachedConversationList);
         }
 
-        // 查询当前用户参与的所有会话
-        // 核心：筛选conversation字段（格式如"1,2,3"）中包含当前用户ID的记录
-        List<ConversationEntity> conversationList = conversationService.lambdaQuery()
-                // 模糊查询：确保用户ID作为独立成员存在（避免匹配到"123"包含"23"的情况）
-                .and(q -> q
-                        .like(ConversationEntity::getConversation, "," + userIdStr + ",") // 中间位置（如"1,2,3"中的"2"）
-                        .or()
-                        .likeRight(ConversationEntity::getConversation, userIdStr + ",") // 开头位置（如"2,3"中的"2"）
-                        .or()
-                        .likeLeft(ConversationEntity::getConversation, "," + userIdStr) // 结尾位置（如"1,2"中的"2"）
-                        .or()
-                        .eq(ConversationEntity::getConversation, userIdStr) // 唯一成员（如"2"）
-                )
-                .list(); // 执行查询
+        List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
 
         // 存入redis
-        redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationList);
+        redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
         redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
 
         // 返回会话列表（若没有参与任何会话，返回空列表而非错误）
-        return Result.ok(conversationList);
+        return Result.ok(conversationListSelf);
     }
 
     /**
@@ -311,4 +300,6 @@ public class ConversationController {
         Page<ConversationVo> re = conversationService.getConversationList(pageNum, pageSize, key);
         return Result.ok(re);
     }
+
+    // TODO 随机100个会话数据用来做实时查询
 }
