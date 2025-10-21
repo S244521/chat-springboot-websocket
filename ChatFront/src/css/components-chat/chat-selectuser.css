@@ -1,0 +1,92 @@
+.select-user {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 620px;
+	/* 适当加宽提升空间感 */
+	padding: 24px;
+	background: #ffffff;
+	/* 白色背景更清爽，搭配主题色边框 */
+	border: 1px solid #00e0ff;
+	border-radius: 12px;
+	/* 更大圆角更现代 */
+	box-shadow: 0 4px 12px rgba(0, 224, 255, 0.2);
+	/* 轻微阴影增强层次感 */
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	z-index: 10;
+}
+
+.select-user .title-box {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #f0f0f0;
+	/* 分隔线 */
+}
+
+.select-user .close-icon {
+	color: #999;
+	font-size: 20px;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.select-user .close-icon:hover {
+	color: #ff4d4f;
+	/* hover时变红更醒目 */
+}
+
+/* 用户列表样式 */
+.select-user .user-list {
+  max-height: 300px; /* 限制高度，超出滚动 */
+  overflow-y: auto;
+  padding: 10px 0;
+}
+
+.select-user .user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.select-user .user-item:hover {
+  background-color: #f5f7fa;
+}
+
+.select-user .user-info {
+  display: flex;
+  gap: 8px;
+}
+
+.select-user .user-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.select-user .user-username {
+  color: #666;
+  font-size: 12px;
+}
+
+.select-user .user-sex {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  background-color: #f0f0f0;
+}
+
+/* 分页控件样式 */
+.select-user .pagination-box {
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: center;
+}

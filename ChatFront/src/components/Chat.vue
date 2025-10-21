@@ -63,14 +63,53 @@
 		</div>
 	</div>
 
+	<div class="select-user" v-if="showSelectUser">
+		<div class="title-box">
+			<span>与他(她)私聊</span>
+			<span class="close-icon" @click="showSelectUser = false">✕</span>
+		</div>
+
+
+		<!-- 用户列表 -->
+		<div class="user-list">
+			<div class="user-item" v-for="user in userPage.records" :key="user.id" @click="handleUserClick(user)">
+				<div class="user-info">
+					<span class="user-name">{{ user.name }}</span>
+					<span class="user-username">({{ user.username }})</span>
+				</div>
+				<span class="user-sex">
+					{{ user.sex === 1 ? '男' : user.sex === 2 ? '女' : '未知' }}
+				</span>
+			</div>
+		</div>
+
+		<!-- 分页控件 -->
+		<div class="pagination-box">
+			<el-pagination v-model:current-page="userPage.current" v-model:page-size="userPage.size"
+				:total="userPage.total" :page-sizes="[5, 10, 15]" layout="total, sizes, prev, pager, next, jumper"
+				@size-change="handlePageSizeChange" @current-change="handleCurrentPageChange" />
+		</div>
+	</div>
+
 	<div class="page-background">
 		<!-- 应用主容器 -->
 		<div class="app-container">
 			<!-- 左侧聊天列表面板 -->
 			<aside class="chat-list-panel">
 				<div class="search-bar">
+					<select v-model="type" required>
+						<!-- 占位符选项 -->
+						<option value="0">私聊</option>
+						<option value="1">群聊</option>
+					</select>
+					<input type="text" placeholder="搜索..." v-model="key" @focus="showSearchResults = true"
+						@blur="hideSearchResults" @input="handleSearch" />
 					<span class="search-icon" @click="search()">🔍</span>
-					<input type="text" placeholder="搜索..." v-model="key" />
+					<ul v-if="type==1&&showSearchResults && filteredList.length > 0" class="search-results-list">
+						<li v-for="item in filteredList" :key="item.id" @mousedown="handleSearchResultClick(item)">
+							{{ item.name }}
+						</li>
+					</ul>
 				</div>
 				<ul class="chat-list">
 					<li v-for="chat in chatListItems" :key="chat.id" class="chat-list-item"
@@ -97,7 +136,7 @@
 						<!-- 标题现在是动态的 -->
 						<div>
 							<h1 class="chat-title">{{ selectedChat.name }}</h1>
-							<p class="chat-subtitle">{{ selectedChat.members }}</p>
+							<p class="chat-subtitle">{{ selectedChat.id }}</p>
 						</div>
 
 						<div class="chat-box">
@@ -158,32 +197,39 @@
 	import {
 		useRouter
 	} from 'vue-router';
+	import {
+		ElPagination
+	} from 'element-plus'; // 引入分页组件
+	import { ElMessage } from 'element-plus';
 
-	// 创建路由实例
-	const router = useRouter();
-
+	const router = useRouter(); // 创建路由实例
 
 	// --- 状态管理 ---
 	const showAttachments = ref(false);
 	const showAddChatGroup = ref(false);
 	const showChangeSelf = ref(false);
+	const showSearchResults = ref(false); // 新增：控制搜索结果下拉列表的显示
+	const showSelectUser = ref(false);
 
-	// 模拟的聊天列表数据
-	const chatListItems = ref([{
-		id: 1,
-		name: '聊天聊天室',
-		avatar: 'https://i.pravatar.cc/40?u=group1',
-		lastMessage: '自己 fonnan mestag...',
-		timestamp: '9:05',
-		members: '聊天室 成员数'
-	}]);
 
+	const chatListItems = ref([]); // 模拟的聊天列表数据
 	const key = ref(""); // 实时查询关键词
+	const RealTimeList = ref([]); // 实时查询本地数据
+	const filteredList = ref([]); // 新增：用于存放过滤后的搜索结果
 	const ChatGroupName = ref(""); //  群聊名称
 	const username = ref("");
 	const password = ref("");
 	const name = ref("");
 	const sex = ref();
+	const type = ref(1);
+	const userPage = ref({
+	  records: [], // 初始化为空数组，避免 v-for 报错
+	  total: 0,
+	  size: 10,
+	  current: 1,
+	  pages: 0
+	});// 私聊查询的用户列表
+	const selectedChat = ref(chatListItems.value[0]); // 当前选中的聊天，默认为第一个
 
 	// 模拟的聊天消息数据 (实际项目中应根据 selectedChat 动态加载)
 	const messages = ref([{
@@ -229,13 +275,90 @@
 	]);
 
 
+	// 点击用户项触发
+	const handleUserClick = (user) => {
+		// alert(`选中用户：\nID: ${user.id}\n姓名: ${user.name}\n用户名: ${user.username}`);
+		// 可选：关闭弹窗或其他操作
+		api({
+			url:'/conversation/create',
+			method:'post',
+			data:{
+				type:0,
+				conversation:user.id
+			}
+		}).then(response => {
+			console.log(response)
+			initchatlist();
+			showSelectUser.value = false;
+		}).catch(error => {
+			// 失败处理
+			console.error('添加私聊失败:', error)
+		})
+	};
+
+	// 每页条数改变时触发
+	const handlePageSizeChange = (size) => {
+		userPage.value.size = size;
+		userPage.value.current = 1; // 重置为第一页
+		loadUserData(1, size, key.value); // 重新加载数据（key根据实际场景传入）
+	};
+
+	// 当前页码改变时触发
+	const handleCurrentPageChange = (page) => {
+		userPage.value.current = page;
+		loadUserData(page, userPage.value.size, key.value); // 重新加载数据
+	};
+
+	// 请求后端的私聊用户
+	const loadUserData=(pageNum,pageSize,key)=>{
+		// 查询用户接口查到用创建会话接口
+		api({
+			url: '/user/selectUser',
+			method: 'get',
+			params: {
+				pageNum:pageNum,
+				pageSize:pageSize,
+				key: key
+			}
+		}).then(response => {
+			console.log(response)
+			userPage.value=response;
+			showSelectUser.value = true;
+		}).catch(error => {
+			// 失败处理
+			console.error('查询用户:', error)
+		})
+	}
 
 
+	// 实时搜索逻辑 现在会同时匹配 name 和 id
+	const handleSearch = () => {
+		if (key.value.trim() !== '') {
+			const searchTerm = key.value.toLowerCase().trim();
+			filteredList.value = RealTimeList.value.filter(item =>
+				item.name.toLowerCase().includes(searchTerm) ||
+				(item.id && item.id.toLowerCase().includes(searchTerm))
+			);
+		} else {
+			filteredList.value = []; // 如果没有输入，则清空列表
+		}
+	};
 
+	//点击搜索结果项的处理函数
+	const handleSearchResultClick = (item) => {
+		key.value = item.id; // 将id的值赋给key
+		showSearchResults.value = false; // 隐藏下拉列表
+	};
 
-
-	// 初始化聊天列表，TODO 初始化实时查询数据
-	const chatlist = () => {
+	// 隐藏搜索结果，并稍作延迟以允许点击事件触发
+	const hideSearchResults = () => {
+		setTimeout(() => {
+			showSearchResults.value = false;
+		}, 200); // 延迟200毫秒
+	};
+	
+	// 初始化用户信息
+	const inituser=()=>{
 		let user = sessionStorage.getItem("user");
 		try {
 			user = JSON.parse(user);
@@ -246,7 +369,24 @@
 		} catch (e) {
 			console.error("解析 user 失败：", e);
 		}
+	}
+	
+	// 初始化实时数据
+	const initrealtime=()=>{
+		api({
+			url: '/conversation/realtime',
+			method: 'get'
+		}).then(response => {
+			RealTimeList.value = response;
+			console.log(RealTimeList.value)
+		}).catch(error => {
+			// 失败处理
+			console.error('获取实时查询数据失败:', error)
+		})
+	}
 
+	// 初始化聊天列表, 初始化实时查询数据
+	const initchatlist = () => {
 		api({
 			url: '/conversation/getself',
 			method: 'get'
@@ -260,9 +400,6 @@
 			alert('获取聊天列表失败: ' + (error.msg || error.message || '未知错误'))
 		})
 	}
-
-	// 当前选中的聊天，默认为第一个
-	const selectedChat = ref(chatListItems.value[0]);
 
 	// 点击切换聊天的函数
 	const selectChat = (chat) => {
@@ -279,13 +416,12 @@
 			}
 		}).then(response => {
 			console.log(response)
+			initchatlist();
 		}).catch(error => {
 			// 失败处理
-			console.error('删除会话失败:', error)
-			alert('删除会话失败: ' + (error.msg || error.message || '未知错误'))
+			ElMessage.error('删除会话失败:'+ JSON.stringify(error))
 		})
 	}
-
 
 	// 添加群聊
 	const addgroupchat = () => {
@@ -300,20 +436,38 @@
 		}).then(response => {
 			console.log(response)
 			showAddChatGroup.value = false;
-			// TODO 创建成功的弹窗
-
+			// 创建成功的弹窗
+			ElMessage.success('创建群聊成功');
 			// 重新获取数据
-			chatlist();
+			initchatlist();
 		}).catch(error => {
 			// 失败处理
-			console.error('创建群聊失败:', error)
-			alert('创建群聊失败: ' + (error.msg || error.message || '未知错误'))
+			ElMessage.error('创建群聊失败:'+ JSON.stringify(error))
 		})
 	}
 
 	// 实时查询
 	const search = () => {
-		alert(key.value)
+		console.log(type.value);
+		if (type.value == 1) {
+			// 用加入会话接口
+			api({
+				url: '/conversation/join',
+				method: 'post',
+				params: {
+					id: key.value
+				}
+			}).then(response => {
+				ElMessage.success(response)
+				initchatlist();
+			}).catch(error => {
+				// 失败处理
+				ElMessage.error('加入群聊失败:'+ JSON.stringify(error))
+			})
+		} else if (type.value == 0) {
+			// 查询用户接口查到用创建会话接口
+			loadUserData(1,10,key.value);
+		}
 	}
 
 	//修改个人信息
@@ -332,11 +486,12 @@
 			if (response.token) {
 				sessionStorage.setItem("user", JSON.stringify(response));
 				localStorage.setItem('token', "Bearer " + response.token)
+				ElMessage.success("修改个人信息成功")
 				router.push('/Chat');
 			}
 		}).catch(error => {
 			// 失败处理
-			console.error('修改信息:', error)
+			ElMessage.error('修改信息失败:'+ JSON.stringify(error))
 		})
 	}
 
@@ -361,14 +516,19 @@
 		}
 	};
 
-
 	// 注册 mounted 钩子，DOM 挂载后自动执行
-	onMounted(chatlist);
+	onMounted(() => {
+	  inituser();
+	  initrealtime();
+	  initchatlist();
+	});
 </script>
 
 <style scoped>
 	@import url("../css/components-chat/chat-selfbox.css");
 	@import url("../css/components-chat/chat-groupbox.css");
+	@import url("../css/components-chat/chat-realtime.css");
+	@import url("../css/components-chat/chat-selectuser.css");
 
 	/* 定义辉光颜色变量 */
 	:root {
@@ -420,17 +580,72 @@
 		flex-direction: column;
 	}
 
+	/* 搜索栏容器 - 调整为相对定位以容纳搜索结果 */
 	.search-bar {
-		padding: 20px;
+		padding: 12px 16px;
+		/* 优化内边距，减少上下空间 */
 		display: flex;
 		align-items: center;
-		gap: 10px;
+		gap: 8px;
+		/* 缩小元素间距，更紧凑 */
 		border-bottom: 1px solid rgba(0, 224, 255, 0.2);
+		position: relative;
+		/* 为搜索结果定位 */
 	}
+
+	/* 聊天类型选择框 */
+	.search-bar select {
+		min-width: 55px;
+		/* 固定最小宽度，避免内容撑开 */
+		padding: 6px 8px;
+		/* 调整内边距 */
+		background: rgba(0, 224, 255, 0.05);
+		border: 1px solid rgba(0, 224, 255, 0.3);
+		border-radius: 6px;
+		/* 略小的圆角，更精致 */
+		color: #fff;
+		outline: none;
+		cursor: pointer;
+		font-size: 13px;
+		/* 调整字体大小 */
+		appearance: none;
+		/* 去除默认箭头 */
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(0,224,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: right 6px center;
+		background-size: 12px;
+		transition: border-color 0.2s;
+	}
+
+	.search-bar select:hover,
+	.search-bar select:focus {
+		border-color: rgba(0, 224, 255, 0.7);
+		/* 聚焦时高亮边框 */
+	}
+
+	.search-bar select option {
+		background-color: rgba(6, 18, 12, 1.0);
+		color: #ffffff;
+		/* 选项文字色 */
+		padding: 6px 10px;
+		/* 选项内边距 */
+	}
+
+	.search-bar select option:checked {
+		background-color: rgba(6, 18, 12, 1.0);
+		color: #fff;
+	}
+
+
 
 	.search-icon {
 		color: var(--glow-cyan);
 		cursor: pointer;
+		font-size: 18px;
+		/* 调整图标大小 */
+		flex-shrink: 0;
+		/* 防止图标被压缩 */
+		transition: transform 0.2s;
 	}
 
 	.search-bar input {
@@ -474,12 +689,12 @@
 		padding-left: 17px;
 	}
 
-	.chat-list-item .avatar {
+	/* 	.chat-list-item .avatar {
 		width: 50px;
 		height: 50px;
 		border-radius: 50%;
 		margin-right: 15px;
-	}
+	} */
 
 	.chat-info {
 		width: 100%;

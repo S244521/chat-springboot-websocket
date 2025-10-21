@@ -125,7 +125,7 @@ public class ConversationController {
     @PostMapping("/join")
     public Result<?> joinConversation(
             @RequestHeader("Authorization") String authorizationHeader,
-            @RequestParam String conversationId
+            @RequestParam("id") String conversationId
     ) {
         // 校验 token（保持原有逻辑）
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
@@ -172,6 +172,12 @@ public class ConversationController {
 
             // 3. 手动提交事务（提交后再释放锁）
             transactionManager.commit(status);
+            String userIdStr = userId.toString();
+            List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
+
+            // 更新redis缓存
+            redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
+            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
             return Result.ok("加入成功");
         } catch (Exception e) {
             transactionManager.rollback(status); // 异常回滚
@@ -232,7 +238,12 @@ public class ConversationController {
             // 3. 手动提交事务（提交后再释放锁）
             transactionManager.commit(status);
 
-            // TODO 删除redis会话
+            String userIdStr = userId.toString();
+            List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
+
+            // 更新redis缓存
+            redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
+            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
             return Result.ok("退出成功");
         } catch (Exception e){
             transactionManager.rollback(status);
@@ -307,5 +318,22 @@ public class ConversationController {
         return Result.ok(re);
     }
 
-    // TODO 随机100个会话数据用来做实时查询
+    /**
+     * 随机100个会话数据用来做实时查询
+     */
+    @GetMapping("/realtime")
+    public Result<?> realtimeConversation(
+            @RequestHeader("Authorization") String authorizationHeader
+    ) {
+        String verifyToken = JwtUtils.verifyToken(authorizationHeader);
+        if(verifyToken!=null){
+            return Result.error(verifyToken);
+        }
+        List<ConversationVo> RealTimelist = (List<ConversationVo>) redisTemplate.opsForValue().get("conversation:RealTime");
+        if(RealTimelist != null){
+            redisTemplate.expire("conversation:RealTime", 1, TimeUnit.DAYS);
+            return Result.ok(RealTimelist);
+        }
+        return Result.error("获取缓存数据失败");
+    }
 }
