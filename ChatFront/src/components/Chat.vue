@@ -1,4 +1,68 @@
 <template>
+	<div class="inputbox" v-if="showAddChatGroup">
+		<!-- 标题和关闭按钮区域 -->
+		<div class="title-box">
+			<span>创建群聊</span>
+			<span class="close-icon" @click="showAddChatGroup = false">✕</span>
+		</div>
+
+		<!-- 输入和添加按钮区域 -->
+		<div class="input-box">
+			<input type="text" v-model="ChatGroupName" placeholder="请输入群聊名称" />
+			<button class="confirm-btn" @click="addgroupchat()">添加</button>
+		</div>
+	</div>
+
+	<div class="self-box" v-if="showChangeSelf">
+		<!-- 标题和关闭按钮区域 -->
+		<div class="title-box">
+			<span>修改个人信息</span>
+			<span class="close-icon" @click="showChangeSelf = false">✕</span>
+		</div>
+
+		<!-- 输入和添加按钮区域 -->
+		<div style="width: 100%;">
+			<div class="form-grid">
+				<!-- 左侧栏 -->
+				<div class="form-column">
+					<div>
+						<div class="user-box">
+							<input type="text" name="reg-username" v-model="username" required>
+							<label>用户名</label>
+						</div>
+						<div class="user-box">
+							<input type="text" name="reg-password" v-model="password" required>
+							<label>密码（直接修改）</label>
+						</div>
+					</div>
+
+					<div>
+						<div class="user-box">
+							<input type="text" name="reg-name" v-model="name" required>
+							<label>名称</label>
+						</div>
+						<div class="user-box user-box-select">
+							<select name="gender" v-model="sex" required>
+								<!-- 占位符选项 -->
+								<option value="2">未知</option>
+								<option value="0">男</option>
+								<option value="1">女</option>
+							</select>
+							<label>性别</label>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<div class="btn-box">
+				<div style="display: flex;justify-content: space-between;;gap: 30px;">
+					<button class="self-btn" @click="logout()">注销</button>
+					<button class="self-btn" @click="changeself()">修改</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<div class="page-background">
 		<!-- 应用主容器 -->
 		<div class="app-container">
@@ -6,7 +70,7 @@
 			<aside class="chat-list-panel">
 				<div class="search-bar">
 					<span class="search-icon" @click="search()">🔍</span>
-					<input type="text" placeholder="搜索..." v-model="key"/>
+					<input type="text" placeholder="搜索..." v-model="key" />
 				</div>
 				<ul class="chat-list">
 					<li v-for="chat in chatListItems" :key="chat.id" class="chat-list-item"
@@ -17,7 +81,8 @@
 								<span class="chat-name">{{ chat.name }}</span>
 								<span class="chat-timestamp">{{ chat.timestamp }}</span>
 							</div>
-							<span class="search-icon" style="font-size: 24px;" @click.stop="deleteById(chat.id)">🗑</span>	
+							<span class="search-icon" style="font-size: 24px;"
+								@click.stop="deleteById(chat.id)">🗑</span>
 							<!-- <p class="last-message">{{ chat.lastMessage }}</p> -->
 						</div>
 					</li>
@@ -33,6 +98,11 @@
 						<div>
 							<h1 class="chat-title">{{ selectedChat.name }}</h1>
 							<p class="chat-subtitle">{{ selectedChat.members }}</p>
+						</div>
+
+						<div class="chat-box">
+							<span class="search-icon" @click="showAddChatGroup=true">➕</span>
+							<span class="search-icon" @click="showChangeSelf=true">👤</span>
 						</div>
 					</div>
 				</header>
@@ -88,23 +158,33 @@
 	import {
 		useRouter
 	} from 'vue-router';
-	
-	
+
+	// 创建路由实例
+	const router = useRouter();
+
+
 	// --- 状态管理 ---
 	const showAttachments = ref(false);
-	
+	const showAddChatGroup = ref(false);
+	const showChangeSelf = ref(false);
+
 	// 模拟的聊天列表数据
 	const chatListItems = ref([{
-			id: 1,
-			name: '聊天聊天室',
-			avatar: 'https://i.pravatar.cc/40?u=group1',
-			lastMessage: '自己 fonnan mestag...',
-			timestamp: '9:05',
-			members: '聊天室 成员数'
-		}
-	]);
-	const key=ref("");
-	
+		id: 1,
+		name: '聊天聊天室',
+		avatar: 'https://i.pravatar.cc/40?u=group1',
+		lastMessage: '自己 fonnan mestag...',
+		timestamp: '9:05',
+		members: '聊天室 成员数'
+	}]);
+
+	const key = ref(""); // 实时查询关键词
+	const ChatGroupName = ref(""); //  群聊名称
+	const username = ref("");
+	const password = ref("");
+	const name = ref("");
+	const sex = ref();
+
 	// 模拟的聊天消息数据 (实际项目中应根据 selectedChat 动态加载)
 	const messages = ref([{
 			id: 1,
@@ -147,21 +227,32 @@
 			timestamp: '2024 45:45'
 		},
 	]);
-	
-	
-	
-	
+
+
+
+
 
 
 
 	// 初始化聊天列表，TODO 初始化实时查询数据
 	const chatlist = () => {
+		let user = sessionStorage.getItem("user");
+		try {
+			user = JSON.parse(user);
+			username.value = user.username;
+			name.value = user.name;
+			sex.value = user.sex;
+			console.log("user: " + username.value + name.value + sex.value);
+		} catch (e) {
+			console.error("解析 user 失败：", e);
+		}
+
 		api({
 			url: '/conversation/getself',
 			method: 'get'
 		}).then(response => {
 			console.log(response)
-			chatListItems.value=response;
+			chatListItems.value = response;
 			console.log(chatListItems.value)
 		}).catch(error => {
 			// 失败处理
@@ -177,14 +268,14 @@
 	const selectChat = (chat) => {
 		selectedChat.value = chat;
 	};
-	
+
 	// 退出会话
 	const deleteById = (id) => {
 		api({
 			url: '/conversation/leave',
 			method: 'post',
-			params:{
-				id:id
+			params: {
+				id: id
 			}
 		}).then(response => {
 			console.log(response)
@@ -195,23 +286,99 @@
 		})
 	}
 
+
+	// 添加群聊
+	const addgroupchat = () => {
+		api({
+			url: '/conversation/create',
+			method: 'post',
+			data: {
+				name: ChatGroupName.value,
+				type: 1,
+				conversation: ""
+			}
+		}).then(response => {
+			console.log(response)
+			showAddChatGroup.value = false;
+			// TODO 创建成功的弹窗
+
+			// 重新获取数据
+			chatlist();
+		}).catch(error => {
+			// 失败处理
+			console.error('创建群聊失败:', error)
+			alert('创建群聊失败: ' + (error.msg || error.message || '未知错误'))
+		})
+	}
+
 	// 实时查询
-	const search =()=> {
+	const search = () => {
 		alert(key.value)
 	}
-	
-	
+
+	//修改个人信息
+	const changeself = () => {
+		api({
+			url: '/user/update',
+			method: 'post',
+			data: {
+				username: username.value,
+				name: name.value,
+				sex: sex.value
+			}
+		}).then(response => {
+			console.log(response)
+			showChangeSelf.value = false;
+			if (response.token) {
+				sessionStorage.setItem("user", JSON.stringify(response));
+				localStorage.setItem('token', "Bearer " + response.token)
+				router.push('/Chat');
+			}
+		}).catch(error => {
+			// 失败处理
+			console.error('修改信息:', error)
+		})
+	}
+
+	// 注销账号
+	const logout = () => {
+		// 显示确认弹窗，用户点击“确定”返回 true，“取消”返回 false
+		if (confirm('确定要注销账号吗？')) {
+			api({
+				url: '/user/logout',
+				method: 'get'
+			}).then(response => {
+				console.log(response)
+				sessionStorage.removeItem("user");
+				localStorage.removeItem("token");
+				router.push('/');
+			}).catch(error => {
+				console.error('注销失败:', error)
+			})
+		} else {
+			// 用户取消注销，可添加提示或不处理
+			console.log('已取消注销');
+		}
+	};
+
+
 	// 注册 mounted 钩子，DOM 挂载后自动执行
 	onMounted(chatlist);
 </script>
 
 <style scoped>
+	@import url("../css/components-chat/chat-selfbox.css");
+	@import url("../css/components-chat/chat-groupbox.css");
+
 	/* 定义辉光颜色变量 */
 	:root {
 		--glow-green: #00ff9c;
 		--glow-cyan: #00e0ff;
 		--glow-blue: #007bff;
 	}
+
+
+
 
 	/* 页面背景 */
 	.page-background {
@@ -369,7 +536,17 @@
 		flex-shrink: 0;
 	}
 
-	/* .header-left {background-color: #007bff;} */
+	.header-left {
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	.chat-box {
+		display: flex;
+		font-size: 30px;
+	}
+
 	.chat-title {
 		color: var(--glow-green);
 		font-size: 20px;

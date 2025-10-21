@@ -5,6 +5,9 @@ import java.util.stream.Collectors;
 
 public class StringUtil {
     public static String xssFilter(String str){
+        if (str==null || str.equals("")){
+            return "";
+        }
         return str.replaceAll("<","&lt;").replaceAll(">","&gt;");
     }
 
@@ -30,6 +33,9 @@ public class StringUtil {
 
     // 字符串解析为数组 '1,2,3'
     public static Set<Integer> split(String str) {
+        if(str==null||str.equals("")){
+            return new HashSet<>();
+        }
         String[] split1 = str.split(",");
         Set<Integer> split= new HashSet<>();
         for(String s : split1){

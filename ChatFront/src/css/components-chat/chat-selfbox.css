@@ -1,0 +1,211 @@
+.self-box {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 320px;
+	/* 适当加宽提升空间感 */
+	padding: 24px;
+	background: #ffffff;
+	/* 白色背景更清爽，搭配主题色边框 */
+	border: 1px solid #00e0ff;
+	border-radius: 12px;
+	/* 更大圆角更现代 */
+	box-shadow: 0 4px 12px rgba(0, 224, 255, 0.2);
+	/* 轻微阴影增强层次感 */
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+	z-index: 10;
+}
+
+.self-box .title-box {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #f0f0f0;
+	/* 分隔线 */
+}
+
+.self-box .close-icon {
+	color: #999;
+	font-size: 20px;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.self-box .close-icon:hover {
+	color: #ff4d4f;
+	/* hover时变红更醒目 */
+}
+
+/* 表单容器样式 */
+.form-grid {
+	width: 80%;
+	/* 限制最大宽度，避免过宽 */
+	margin: 20px auto;
+	/* 居中显示 */
+	padding: 24px;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+	/* 轻微阴影增强层次感 */
+}
+
+/* 列容器 */
+.form-column {
+	display: flex;
+	/* flex-direction: column; */
+	gap: 20px;
+	/* 输入框之间的间距 */
+}
+
+/* 输入框容器通用样式 */
+.user-box {
+	position: relative;
+	/* 用于定位label */
+	height: 50px;
+	margin-top: 20px;
+	/* 固定高度，保持一致性 */
+}
+
+/* 输入框基础样式 */
+.user-box input {
+	width: 100%;
+	height: 100%;
+	padding: 0 16px;
+	padding-top: 12px;
+	/* 顶部留白给label */
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	font-size: 14px;
+	color: #333;
+	background: transparent;
+	transition: all 0.2s ease;
+	outline: none;
+	box-sizing: border-box;
+}
+
+/* 输入框聚焦状态 */
+.user-box input:focus {
+	border-color: #3b82f6;
+	/* 蓝色边框强调 */
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+	/* 轻微聚焦光晕 */
+}
+
+/* label样式与动画 */
+.user-box label {
+	position: absolute;
+	left: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 14px;
+	color: #9ca3af;
+	/* 灰色提示文字 */
+	pointer-events: none;
+	/* 不影响输入框点击 */
+	transition: all 0.2s ease;
+	padding: 0 4px;
+	background: #fff;
+	/* 背景覆盖边框，避免穿过文字 */
+}
+
+/* 输入框有内容或聚焦时，label上移 */
+.user-box input:focus+label,
+.user-box input:not(:placeholder-shown)+label {
+	top: 0;
+	transform: translateY(-50%);
+	font-size: 12px;
+	color: #3b82f6;
+	/* 聚焦时文字变蓝 */
+}
+
+/* 下拉选择框样式 */
+.user-box-select {
+	/* 复用输入框容器样式，保持高度一致 */
+}
+
+.user-box-select select {
+	width: 100%;
+	height: 100%;
+	padding: 0 16px;
+	padding-top: 12px;
+	/* 与输入框保持一致的顶部留白 */
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	font-size: 14px;
+	color: #333;
+	background: transparent;
+	appearance: none;
+	/* 去除默认下拉箭头 */
+	outline: none;
+	box-sizing: border-box;
+	transition: all 0.2s ease;
+}
+
+/* 自定义下拉箭头 */
+.user-box-select::after {
+	content: "▼";
+	position: absolute;
+	right: 16px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 12px;
+	color: #9ca3af;
+	pointer-events: none;
+}
+
+/* 下拉框聚焦状态 */
+.user-box-select select:focus {
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* 下拉框选中状态时label样式 */
+.user-box-select select:focus+label,
+.user-box-select select:not([value="2"])+label {
+	/* 排除默认占位符选项 */
+	top: 0;
+	transform: translateY(-50%);
+	font-size: 12px;
+	color: #3b82f6;
+}
+
+.btn-box {
+	/* width: 40%; */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	/* background-color: #00e0ff; */
+}
+
+.self-btn {
+	padding: 10px 40px;
+	/* 按钮加大更易点击 */
+	background: #00e0ff;
+	/* 主题色按钮 */
+	color: #fff;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s;
+	white-space: nowrap;
+	/* 防止按钮文字换行 */
+}
+
+
+.self-btn:hover {
+	background: #00c8e6;
+	/* 加深颜色反馈 */
+	transform: translateY(-1px);
+	/* 轻微上浮效果 */
+}
+
+.self-btn:active {
+	transform: translateY(0);
+	/* 点击时恢复 */
+}

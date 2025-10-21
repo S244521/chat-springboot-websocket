@@ -111,7 +111,7 @@
 				// 成功处理
 				console.log('登录成功:', response)
 				if (response.token) {
-					sessionStorage.setItem("user", response);
+					sessionStorage.setItem("user", JSON.stringify(response));
 					localStorage.setItem('token', "Bearer " + response.token)
 					router.push('/Chat');
 				}
@@ -136,7 +136,7 @@
 				// 成功处理
 				console.log('注册成功:', response)
 				if (response.token) {
-					sessionStorage.setItem("user", response);
+					sessionStorage.setItem("user", JSON.stringify(response));
 					localStorage.setItem('token', "Bearer " + response.token)
 					router.push('/Chat');
 				}

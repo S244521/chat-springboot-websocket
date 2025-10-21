@@ -101,6 +101,12 @@ public class ConversationController {
             // 保存会话（加锁状态下执行，确保UUID唯一）
             boolean re = conversationService.save(new ConversationEntity(uid,conversationEntity.getName(), conversationEntity.getType(), standardization));
             if(re){
+                String userIdStr = userId.toString();
+                List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
+
+                // 更新redis缓存
+                redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
+                redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
                 return Result.ok("创建会话成功");
             }
             return Result.error("创建会话失败");

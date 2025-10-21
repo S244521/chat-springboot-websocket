@@ -342,7 +342,8 @@
                             
                             const response = await axios.post(UPLOAD_URL, formData, {
                                 headers: {
-                                    'Content-Type': 'multipart/form-data'
+                                    'Content-Type': 'multipart/form-data',
+									'Authorization': 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyNDQ1MjEiLCJ1c2VySWQiOjEsIm5hbWUiOiLpmbblk6UiLCJjcmVhdGVkQXQiOiIyMDI1LTEwLTIxVDEzOjM4OjQ4LjU2MzEwOTQwMCIsImlhdCI6MTc2MTAyNTEyOCwiZXhwIjoxNzYxMTExNTI4fQ.7i4uWUiu4fIHG7y-cEW4fsVWOJ5_mAaTRXRFnezyQOw'
                                 },
                                 // onUploadProgress 可以在这里计算每个块的上传进度，但这里我们只关心整体进度
                             });

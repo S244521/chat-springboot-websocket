@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
  */
 @Component
 // 只有当配置task.enable.conversation为true时，才实例化该类
-@ConditionalOnProperty(name = "task.enable.conversation", havingValue = "true")
+@ConditionalOnProperty(name = "task.enable.other", havingValue = "true")
 @Slf4j
 public class ConversationTask {
     @Autowired

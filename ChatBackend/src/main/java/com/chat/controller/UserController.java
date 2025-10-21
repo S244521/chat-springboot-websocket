@@ -82,19 +82,30 @@ public class UserController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody UserEntity user)
     {
-        String verifyToken = JwtUtils.verifyToken(authorizationHeader);
-        if(verifyToken!=null){
-            return Result.error(verifyToken);
+// 校验 token（保持原有逻辑）
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            return Result.error("Authorization 头格式错误");
         }
+        String tokenHeader = authorizationHeader.substring(7);
+
+        if (JwtUtils.isTokenExpired(tokenHeader)) {
+            return Result.error("token 已过期，请重新登录"); // 明确提示“过期”，比“无效”更精准
+        }
+
+        String usernameToken = JwtUtils.parseUsername(tokenHeader);
+        if (usernameToken == null) {
+            return Result.error("token 无效");
+        }
+        Integer userId = Math.toIntExact(JwtUtils.parseToken(tokenHeader).get("userId", Long.class));
 
         String username = StringUtil.xssFilter(user.getUsername());
         String password = SHA256Util.encrypt(StringUtil.xssFilter(user.getPassword()));
         String name = StringUtil.xssFilter(user.getName());
 
-        boolean re = userService.updateById(new UserEntity(user.getId(), username, password, name, user.getSex()));
+        boolean re = userService.updateById(new UserEntity(userId, username, password, name, user.getSex()));
         if(re){
             LocalDateTime now = LocalDateTime.now();
-            String token = JwtUtils.generateToken(username, Long.valueOf(user.getId()),name, now);
+            String token = JwtUtils.generateToken(username, Long.valueOf(userId),name, now);
             return Result.ok(
                     Map.of("username", username,
                             "name", name,

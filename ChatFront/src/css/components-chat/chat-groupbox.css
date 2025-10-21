@@ -1,0 +1,114 @@
+	/* 添加群聊 */
+	.inputbox {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 220px;
+		/* 适当加宽提升空间感 */
+		padding: 24px;
+		background: #ffffff;
+		/* 白色背景更清爽，搭配主题色边框 */
+		border: 1px solid #00e0ff;
+		border-radius: 12px;
+		/* 更大圆角更现代 */
+		box-shadow: 0 4px 12px rgba(0, 224, 255, 0.2);
+		/* 轻微阴影增强层次感 */
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		z-index: 10;
+	}
+
+	/* 标题区域样式 */
+	.inputbox .title-box {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 8px;
+		border-bottom: 1px solid #f0f0f0;
+		/* 分隔线 */
+	}
+
+	.inputbox .title-box span:first-child {
+		font-size: 18px;
+		font-weight: 600;
+		/* 标题加粗 */
+		color: #333;
+		/* 深灰色标题更稳重 */
+	}
+
+	/* 关闭按钮样式 */
+	.inputbox .close-icon {
+		color: #999;
+		font-size: 20px;
+		cursor: pointer;
+		transition: color 0.2s;
+	}
+
+	.inputbox .close-icon:hover {
+		color: #ff4d4f;
+		/* hover时变红更醒目 */
+	}
+
+	/* 输入区域样式 */
+	.inputbox .input-box {
+		width: 100%;
+		display: flex;
+		gap: 12px;
+		/* 输入框和按钮间距 */
+		align-items: center;
+	}
+
+	.inputbox input {
+		width: 60%;
+		/* 输入框占满剩余空间 */
+		padding: 10px 14px;
+		/* 加大内边距更舒适 */
+		border: 1px solid #ddd;
+		border-radius: 6px;
+		font-size: 14px;
+		transition: border-color 0.2s;
+	}
+
+	.inputbox input:focus {
+		border-color: #00e0ff;
+		/* 聚焦时显示主题色边框 */
+		outline: none;
+		box-shadow: 0 0 0 2px rgba(0, 224, 255, 0.1);
+		/* 轻微聚焦阴影 */
+	}
+
+	.inputbox input::placeholder {
+		color: #ccc;
+		/* 占位符浅灰色 */
+	}
+
+	/* 按钮样式优化 */
+	.inputbox .confirm-btn {
+		padding: 10px 20px;
+		/* 按钮加大更易点击 */
+		background: #00e0ff;
+		/* 主题色按钮 */
+		color: #fff;
+		border: none;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.2s;
+		white-space: nowrap;
+		/* 防止按钮文字换行 */
+	}
+
+	.inputbox .confirm-btn:hover {
+		background: #00c8e6;
+		/* 加深颜色反馈 */
+		transform: translateY(-1px);
+		/* 轻微上浮效果 */
+	}
+
+	.inputbox .confirm-btn:active {
+		transform: translateY(0);
+		/* 点击时恢复 */
+	}
