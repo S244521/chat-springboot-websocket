@@ -11,7 +11,7 @@
  Target Server Version : 80037 (8.0.37)
  File Encoding         : 65001
 
- Date: 22/10/2025 16:24:21
+ Date: 22/10/2025 19:00:27
 */
 
 SET NAMES utf8mb4;
@@ -34,11 +34,13 @@ CREATE TABLE `conversation`  (
 -- ----------------------------
 INSERT INTO `conversation` VALUES ('13f695a9f2bc4687838cda95351efd47', NULL, 0, '9');
 INSERT INTO `conversation` VALUES ('1be2d03e94874adfacc162d1c8d4428c', '深夜树洞', 1, '1,9');
-INSERT INTO `conversation` VALUES ('3029bbc5b00e4a37b5cb8be3fcbbc331', '天地一家大爱盟', 1, '');
+INSERT INTO `conversation` VALUES ('3029bbc5b00e4a37b5cb8be3fcbbc331', '天地一家大爱盟', 1, '1,5,7');
+INSERT INTO `conversation` VALUES ('37241dbb8bda4766b2e5686674c87e4e', NULL, 0, '5,7');
 INSERT INTO `conversation` VALUES ('43f2b4b766114a51b21aacf87dbe3033', '智哥搞事情', 1, '1,9');
 INSERT INTO `conversation` VALUES ('80f8c269c946438186a25097752ea4d0', NULL, 0, '7,9');
 INSERT INTO `conversation` VALUES ('823e2259c4054927b4835f7ec270af89', NULL, 0, '9,14');
 INSERT INTO `conversation` VALUES ('975041d8220d49c48516c61732b4fceb', '智哥悄悄话', 1, '1');
+INSERT INTO `conversation` VALUES ('e903e4d7473f4e68b84a2b462a9c3401', NULL, 0, '5');
 
 -- ----------------------------
 -- Table structure for file
@@ -71,12 +73,23 @@ CREATE TABLE `history`  (
   `conversationid` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '会话id',
   `text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '聊天记录',
   `createtime` datetime NULL DEFAULT NULL COMMENT '发送时间',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '聊天记录表' ROW_FORMAT = DYNAMIC;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_message_conversationid`(`conversationid` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '聊天记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of history
 -- ----------------------------
+INSERT INTO `history` VALUES (1, 9, '823e2259c4054927b4835f7ec270af89', '你好呀', '2025-10-22 16:58:31');
+INSERT INTO `history` VALUES (2, 9, '823e2259c4054927b4835f7ec270af89', '1', '2025-10-22 17:01:22');
+INSERT INTO `history` VALUES (3, 9, '823e2259c4054927b4835f7ec270af89', '不知道啊', '2025-10-22 17:19:41');
+INSERT INTO `history` VALUES (4, 9, '823e2259c4054927b4835f7ec270af89', '1', '2025-10-22 17:20:06');
+INSERT INTO `history` VALUES (5, 9, '823e2259c4054927b4835f7ec270af89', '啊实打实', '2025-10-22 17:22:30');
+INSERT INTO `history` VALUES (6, 5, '3029bbc5b00e4a37b5cb8be3fcbbc331', '有人吗', '2025-10-22 18:29:15');
+INSERT INTO `history` VALUES (7, 5, '3029bbc5b00e4a37b5cb8be3fcbbc331', '你好呀', '2025-10-22 18:29:23');
+INSERT INTO `history` VALUES (8, 7, '3029bbc5b00e4a37b5cb8be3fcbbc331', 'yyds', '2025-10-22 18:38:58');
+INSERT INTO `history` VALUES (9, 7, '37241dbb8bda4766b2e5686674c87e4e', '你好', '2025-10-22 18:44:01');
+INSERT INTO `history` VALUES (10, 1, '3029bbc5b00e4a37b5cb8be3fcbbc331', '666', '2025-10-22 18:44:50');
 
 -- ----------------------------
 -- Table structure for root

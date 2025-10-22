@@ -75,7 +75,9 @@ public class ConversationController {
         Long userId = JwtUtils.parseToken(token).get("userId", Long.class);
         Set<Integer> split = StringUtil.split(conversationEntity.getConversation());
         split.add(Math.toIntExact(userId));
+        System.out.println("userid: "+token);
         String standardization = StringUtil.standardization(split);
+        System.out.println("userid: "+standardization);
 
 
         String uid;
@@ -101,12 +103,12 @@ public class ConversationController {
             // 保存会话（加锁状态下执行，确保UUID唯一）
             boolean re = conversationService.save(new ConversationEntity(uid,conversationEntity.getName(), conversationEntity.getType(), standardization));
             if(re){
-                String userIdStr = userId.toString();
-                List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
-
-                // 更新redis缓存
-                 redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
-                redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
+//                String userIdStr = userId.toString();
+//                List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
+//
+//                // 更新redis缓存
+//                 redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
+//                redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
                 return Result.ok("创建会话成功");
             }
             return Result.error("创建会话失败");
@@ -172,12 +174,12 @@ public class ConversationController {
 
             // 3. 手动提交事务（提交后再释放锁）
             transactionManager.commit(status);
-            String userIdStr = userId.toString();
-            List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
+//            String userIdStr = userId.toString();
+//            List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
 
             // 更新redis缓存
-            redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
-            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
+//            redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
+//            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
             return Result.ok("加入成功");
         } catch (Exception e) {
             transactionManager.rollback(status); // 异常回滚
@@ -238,12 +240,12 @@ public class ConversationController {
             // 3. 手动提交事务（提交后再释放锁）
             transactionManager.commit(status);
 
-            String userIdStr = userId.toString();
-            List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
+//            String userIdStr = userId.toString();
+//            List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
 
             // 更新redis缓存
-            redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
-            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
+//            redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
+//            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
             return Result.ok("退出成功");
         } catch (Exception e){
             transactionManager.rollback(status);
@@ -282,18 +284,18 @@ public class ConversationController {
         String userIdStr = userIntId.toString(); // 转换为字符串，用于模糊查询
 
         // 先查询redis缓存
-        List<ConversationVo> cachedConversationList = (List<ConversationVo>) redisTemplate.opsForValue().get("conversation:" + userId+":"+username);
-        if(cachedConversationList != null){
-            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
-            return Result.ok(cachedConversationList);
-        }
+//        List<ConversationVo> cachedConversationList = (List<ConversationVo>) redisTemplate.opsForValue().get("conversation:" + userId+":"+username);
+//        if(cachedConversationList != null){
+//            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
+//            return Result.ok(cachedConversationList);
+//        }
 
         List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
         conversationListSelf.forEach(System.out::println);
 
         // 存入redis
-        redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
-        redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
+//        redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
+//        redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
 
         // 返回会话列表（若没有参与任何会话，返回空列表而非错误）
         return Result.ok(conversationListSelf);

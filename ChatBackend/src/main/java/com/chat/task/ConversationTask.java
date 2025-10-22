@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 /**
  * 定时任务,清除conversation里面的用户少于2的私聊会话
  */
+// TODO 各种相关的定时任务可能还有写暂时搞忘了要写什么
 @Component
 // 只有当配置task.enable.conversation为true时，才实例化该类
 @ConditionalOnProperty(name = "task.enable.other", havingValue = "true")

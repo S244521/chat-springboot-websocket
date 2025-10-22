@@ -148,8 +148,9 @@
 
 				<!-- 消息显示区域 -->
 				<main class="chat-messages">
-					<div v-for="message in messages" :key="message.id" class="message-wrapper" :class="{ 'sent': myuser && myuser.name === message.sender, 'received': myuser && myuser.name !== message.sender }">
-					<!-- <div v-for="message in messages" :key="message.id" class="message-wrapper" :class="{ 'sent': myuser && myuser.name === message.sender }"> -->
+					<div v-for="message in messages" :key="message.id" class="message-wrapper"
+						:class="{ 'sent': myuser && myuser.name === message.sender, 'received': myuser && myuser.name !== message.sender }">
+						<!-- <div v-for="message in messages" :key="message.id" class="message-wrapper" :class="{ 'sent': myuser && myuser.name === message.sender }"> -->
 						<div class="message-content">
 							<div class="message-sender">{{ message.sender }}</div>
 							<div class="message-bubble">
@@ -162,7 +163,8 @@
 
 				<!-- 底部输入区域 -->
 				<footer class="chat-footer">
-					<input type="text" class="message-input" v-model="messageInput" placeholder="请输入消息..." @keyup.enter="sendMessage"/>
+					<input type="text" class="message-input" v-model="messageInput" placeholder="请输入消息..."
+						@keyup.enter="sendMessage" />
 					<span class="icon" @click="showAttachments = !showAttachments">📎</span>
 					<button class="send-button" @click="sendMessage">发送</button>
 				</footer>
@@ -235,9 +237,9 @@
 	const messages = ref([]); // 消息列表
 	const messageInput = ref(""); // 用于绑定输入框的消息内容
 	const ws = ref(null); // 用于持有 WebSocket 实例
-	const myuser=ref();// 用户信息
+	const myuser = ref(); // 用户信息
 
-//*******************websocket***********************//
+	//*******************websocket***********************//
 
 	// 监听 selectedChat 的变化，以便在聊天切换时重新连接 WebSocket
 	watch(selectedChat, (newChat, oldChat) => {
@@ -288,6 +290,16 @@
 		};
 	};
 
+	const formatCurrentTime = () => {
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const day = String(now.getDate()).padStart(2, '0');
+		const hours = String(now.getHours()).padStart(2, '0');
+		const minutes = String(now.getMinutes()).padStart(2, '0');
+
+		return `${year}/${month}/${day} ${hours}:${minutes}`;
+	}
 
 	// 发送消息的函数
 	const sendMessage = () => {
@@ -298,14 +310,25 @@
 			const messageToSend = {
 				sender: user.name, // 发送者名称
 				text: messageInput.value,
-				timestamp: new Date().toLocaleTimeString()
+				timestamp: formatCurrentTime()
 			};
+			api({
+				url: '/history/addHistory',
+				method: 'post',
+				data: {
+					conversationid: selectedChat.value.id,
+					text: messageInput.value
+				}
+			}).then(response => {
+				console.log(response)
+				ws.value.send(JSON.stringify(messageToSend));
+				// 清空输入框
+				messageInput.value = "";
+			}).catch(error => {
+				// 失败处理
+				ElMessage.error('发送消息失败:' + JSON.stringify(error))
+			})
 
-			ws.value.send(JSON.stringify(messageToSend));
-
-
-			// 清空输入框
-			messageInput.value = "";
 		} else {
 			console.log("WebSocket 未连接或消息为空");
 			ElMessage.warning('连接已断开或消息不能为空！');
@@ -316,7 +339,7 @@
 
 
 
-//********************************常规函数*****************************//
+	//********************************常规函数*****************************//
 
 	// 点击用户项触发
 	const handleUserClick = (user) => {
@@ -409,7 +432,7 @@
 			name.value = user.name;
 			sex.value = user.sex;
 			console.log("user: " + username.value + name.value + sex.value);
-			myuser.value=user;
+			myuser.value = user;
 		} catch (e) {
 			console.error("解析 user 失败：", e);
 		}
@@ -448,6 +471,29 @@
 	// 点击切换聊天的函数
 	const selectChat = (chat) => {
 		selectedChat.value = chat;
+		// 获取会话的历史数据
+		api({
+			url: '/history/getHistoryByConversationId',
+			method: 'post',
+			data: {
+				conversationId: chat.id
+			}
+		}).then(response => {
+			// console.log("获取历史聊天记录");
+			// console.log(response)
+			response.forEach(item => {
+				const messageinit = {
+					sender: item.username,
+					text: item.text,
+					timestamp: item.createtime
+				}
+				// console.log(messageinit);
+				messages.value.push(messageinit);
+			})
+		}).catch(error => {
+			// 失败处理
+			ElMessage.error('获取历史聊天记录失败:' + JSON.stringify(error))
+		})
 	};
 
 	// 退出会话
@@ -870,12 +916,37 @@
 
 	.send-button {
 		color: #ffffff;
-		background-color: #03a7ff;
+		width: 10%;
+		height: 100%;
+		border-radius: 12px;
+		/* 增加圆角弧度，更柔和 */
+		background: linear-gradient(135deg, #03a7ff 0%, #0077e6 100%);
+		/* 渐变背景，提升质感 */
+		border: none;
+		/* 去掉默认边框 */
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		/* 统一过渡动画，让交互更丝滑 */
+		box-shadow: 0 4px 8px rgba(3, 167, 255, 0.3);
+		/* 初始阴影，增强立体感 */
 	}
 
 	.send-button:hover {
-		/* transform: scale(1.05); */
-		box-shadow: 0 0 12px #00ff9c;
+		box-shadow: 0 0 15px #7bdcff, 0 4px 12px rgba(3, 167, 255, 0.5);
+		/* 复合阴影，hover时更醒目 */
+		transform: translateY(-2px);
+		/* 轻微上浮，增强交互反馈 */
+		background: linear-gradient(135deg, #00c2ff 0%, #0088ff 100%);
+		/* hover时渐变加深 */
+	}
+
+	.send-button:active {
+		transform: translateY(0);
+		/* 点击时还原位置 */
+		box-shadow: 0 2px 4px rgba(3, 167, 255, 0.3);
+		/* 点击时阴影缩小，模拟按压感 */
 	}
 
 	/* --- 附件弹窗 (样式与之前版本相同) --- */
