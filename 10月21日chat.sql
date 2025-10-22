@@ -11,7 +11,7 @@
  Target Server Version : 80037 (8.0.37)
  File Encoding         : 65001
 
- Date: 21/10/2025 20:36:53
+ Date: 22/10/2025 16:24:21
 */
 
 SET NAMES utf8mb4;
@@ -33,7 +33,7 @@ CREATE TABLE `conversation`  (
 -- Records of conversation
 -- ----------------------------
 INSERT INTO `conversation` VALUES ('13f695a9f2bc4687838cda95351efd47', NULL, 0, '9');
-INSERT INTO `conversation` VALUES ('1be2d03e94874adfacc162d1c8d4428c', '深夜树洞', 1, '1');
+INSERT INTO `conversation` VALUES ('1be2d03e94874adfacc162d1c8d4428c', '深夜树洞', 1, '1,9');
 INSERT INTO `conversation` VALUES ('3029bbc5b00e4a37b5cb8be3fcbbc331', '天地一家大爱盟', 1, '');
 INSERT INTO `conversation` VALUES ('43f2b4b766114a51b21aacf87dbe3033', '智哥搞事情', 1, '1,9');
 INSERT INTO `conversation` VALUES ('80f8c269c946438186a25097752ea4d0', NULL, 0, '7,9');
@@ -72,7 +72,7 @@ CREATE TABLE `history`  (
   `text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '聊天记录',
   `createtime` datetime NULL DEFAULT NULL COMMENT '发送时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '聊天记录表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '聊天记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of history
@@ -116,9 +116,9 @@ INSERT INTO `user` VALUES (3, 'jiege', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a
 INSERT INTO `user` VALUES (4, 'laiyila', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '莱伊拉', 2);
 INSERT INTO `user` VALUES (5, 'naxida', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '纳西达', 1);
 INSERT INTO `user` VALUES (6, 'keqing', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '刻晴', 2);
-INSERT INTO `user` VALUES (7, 'wangchuqing', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '万晴初', 1);
+INSERT INTO `user` VALUES (7, 'wanchuqing', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '万晴初', 1);
 INSERT INTO `user` VALUES (8, 'guyuefangyuan', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '古月方源', 0);
-INSERT INTO `user` VALUES (9, 'wusuai', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '吴帅', 0);
+INSERT INTO `user` VALUES (9, 'wushuai', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '吴帅', 0);
 INSERT INTO `user` VALUES (10, 'wuyong', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '武庸', 2);
 INSERT INTO `user` VALUES (11, 'fengjinhuang', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '凤金煌', 1);
 INSERT INTO `user` VALUES (12, 'fengjiuge', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', '凤九歌', 2);

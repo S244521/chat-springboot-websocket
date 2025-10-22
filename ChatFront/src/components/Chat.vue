@@ -148,13 +148,12 @@
 
 				<!-- 消息显示区域 -->
 				<main class="chat-messages">
-					<div class="time-separator">2024.05.26</div>
-					<div v-for="message in messages" :key="message.id" class="message-wrapper" :class="message.type">
-						<img :src="message.avatar" alt="avatar" class="avatar" />
+					<div v-for="message in messages" :key="message.id" class="message-wrapper" :class="{ 'sent': myuser && myuser.name === message.sender, 'received': myuser && myuser.name !== message.sender }">
+					<!-- <div v-for="message in messages" :key="message.id" class="message-wrapper" :class="{ 'sent': myuser && myuser.name === message.sender }"> -->
 						<div class="message-content">
-							<div v-if="message.type === 'received'" class="message-sender">{{ message.sender }}</div>
+							<div class="message-sender">{{ message.sender }}</div>
 							<div class="message-bubble">
-								<p>{{ message.text }}</p>
+								{{ message.text }}
 							</div>
 							<div class="message-timestamp">{{ message.timestamp }}</div>
 						</div>
@@ -163,9 +162,9 @@
 
 				<!-- 底部输入区域 -->
 				<footer class="chat-footer">
-					<input type="text" class="message-input" placeholder="请输入消息..." />
+					<input type="text" class="message-input" v-model="messageInput" placeholder="请输入消息..." @keyup.enter="sendMessage"/>
 					<span class="icon" @click="showAttachments = !showAttachments">📎</span>
-					<button class="send-button">发送</button>
+					<button class="send-button" @click="sendMessage">发送</button>
 				</footer>
 
 				<!-- 附件弹出窗口 -->
@@ -191,7 +190,8 @@
 <script setup>
 	import {
 		ref,
-		onMounted
+		onMounted,
+		watch
 	} from 'vue';
 	import api from '../util/request';
 	import {
@@ -200,7 +200,9 @@
 	import {
 		ElPagination
 	} from 'element-plus'; // 引入分页组件
-	import { ElMessage } from 'element-plus';
+	import {
+		ElMessage
+	} from 'element-plus';
 
 	const router = useRouter(); // 创建路由实例
 
@@ -223,68 +225,109 @@
 	const sex = ref();
 	const type = ref(1);
 	const userPage = ref({
-	  records: [], // 初始化为空数组，避免 v-for 报错
-	  total: 0,
-	  size: 10,
-	  current: 1,
-	  pages: 0
-	});// 私聊查询的用户列表
-	const selectedChat = ref(chatListItems.value[0]); // 当前选中的聊天，默认为第一个
+		records: [], // 初始化为空数组，避免 v-for 报错
+		total: 0,
+		size: 10,
+		current: 1,
+		pages: 0
+	}); // 私聊查询的用户列表
+	const selectedChat = ref(null); // 初始值设为 null
+	const messages = ref([]); // 消息列表
+	const messageInput = ref(""); // 用于绑定输入框的消息内容
+	const ws = ref(null); // 用于持有 WebSocket 实例
+	const myuser=ref();// 用户信息
 
-	// 模拟的聊天消息数据 (实际项目中应根据 selectedChat 动态加载)
-	const messages = ref([{
-			id: 1,
-			type: 'sent',
-			sender: 'Me',
-			text: '自己 fonnan mestag...',
-			avatar: 'https://i.pravatar.cc/40?u=a',
-			timestamp: '9:05 SS'
-		},
-		{
-			id: 2,
-			type: 'received',
-			sender: '眠呢',
-			text: '收到的消息示例',
-			avatar: 'https://i.pravatar.cc/40?u=b',
-			timestamp: '2024 65:25'
-		},
-		{
-			id: 3,
-			type: 'received',
-			sender: '咱人',
-			text: '这是另一条收到的消息。',
-			avatar: 'https://i.pravatar.cc/40?u=c',
-			timestamp: '2024 45-35'
-		},
-		{
-			id: 4,
-			type: 'sent',
-			sender: 'Me',
-			text: 'Withla mestag...',
-			avatar: 'https://i.pravatar.cc/40?u=a',
-			timestamp: '9:05 SS'
-		},
-		{
-			id: 5,
-			type: 'received',
-			sender: '咱人',
-			text: '你好！Vue 3 真棒！',
-			avatar: 'https://i.pravatar.cc/40?u=d',
-			timestamp: '2024 45:45'
-		},
-	]);
+//*******************websocket***********************//
 
+	// 监听 selectedChat 的变化，以便在聊天切换时重新连接 WebSocket
+	watch(selectedChat, (newChat, oldChat) => {
+		// 如果旧的聊天存在，并且ws连接也存在，则断开旧的连接
+		if (oldChat && ws.value) {
+			ws.value.close();
+			console.log(`已断开与聊天 [${oldChat.id}] 的 WebSocket 连接`);
+		}
+
+		// 如果选择了新的聊天
+		if (newChat) {
+			// 清空旧的消息列表
+			messages.value = [];
+			// 连接新的 WebSocket
+			connectWebSocket(newChat.id);
+		}
+	});
+
+	// WebSocket 连接函数
+	const connectWebSocket = (chatId) => {
+		// 确保 chatId 有效
+		if (!chatId) return;
+
+		// 请将 "localhost:8080" 替换为你的后端服务器地址和端口
+		const wsUrl = `ws://localhost:9999/ws/${chatId}`;
+		ws.value = new WebSocket(wsUrl);
+
+		ws.value.onopen = () => {
+			console.log(`成功连接到聊天 [${chatId}] 的 WebSocket 服务器`);
+			// 可以在这里发送一条 "加入" 消息或获取历史消息
+		};
+
+		ws.value.onmessage = (event) => {
+			console.log(`收到来自 [${chatId}] 的消息:`, event.data);
+			// 这里假设后端发送的是 JSON 格式的消息
+			// { id: ..., type: 'received', sender: '...', text: '...', avatar: '...', timestamp: '...' }
+			// 你需要根据后端实际返回的数据格式来解析
+			const receivedMessage = JSON.parse(event.data);
+			messages.value.push(receivedMessage);
+		};
+
+		ws.value.onclose = () => {
+			console.log(`与聊天 [${chatId}] 的 WebSocket 连接已关闭`);
+		};
+
+		ws.value.onerror = (error) => {
+			console.error(`WebSocket 连接 [${chatId}] 出错:`, error);
+		};
+	};
+
+
+	// 发送消息的函数
+	const sendMessage = () => {
+		if (ws.value && ws.value.readyState === WebSocket.OPEN && messageInput.value.trim() !== '') {
+			// 你需要构建一个消息对象，与后端和你自己的消息展示格式对齐
+			// 例如，从 sessionStorage 获取当前用户信息来填充 sender 等字段
+			const user = JSON.parse(sessionStorage.getItem("user"));
+			const messageToSend = {
+				sender: user.name, // 发送者名称
+				text: messageInput.value,
+				timestamp: new Date().toLocaleTimeString()
+			};
+
+			ws.value.send(JSON.stringify(messageToSend));
+
+
+			// 清空输入框
+			messageInput.value = "";
+		} else {
+			console.log("WebSocket 未连接或消息为空");
+			ElMessage.warning('连接已断开或消息不能为空！');
+		}
+	};
+
+
+
+
+
+//********************************常规函数*****************************//
 
 	// 点击用户项触发
 	const handleUserClick = (user) => {
 		// alert(`选中用户：\nID: ${user.id}\n姓名: ${user.name}\n用户名: ${user.username}`);
 		// 可选：关闭弹窗或其他操作
 		api({
-			url:'/conversation/create',
-			method:'post',
-			data:{
-				type:0,
-				conversation:user.id
+			url: '/conversation/create',
+			method: 'post',
+			data: {
+				type: 0,
+				conversation: user.id
 			}
 		}).then(response => {
 			console.log(response)
@@ -310,19 +353,19 @@
 	};
 
 	// 请求后端的私聊用户
-	const loadUserData=(pageNum,pageSize,key)=>{
+	const loadUserData = (pageNum, pageSize, key) => {
 		// 查询用户接口查到用创建会话接口
 		api({
 			url: '/user/selectUser',
 			method: 'get',
 			params: {
-				pageNum:pageNum,
-				pageSize:pageSize,
+				pageNum: pageNum,
+				pageSize: pageSize,
 				key: key
 			}
 		}).then(response => {
 			console.log(response)
-			userPage.value=response;
+			userPage.value = response;
 			showSelectUser.value = true;
 		}).catch(error => {
 			// 失败处理
@@ -356,9 +399,9 @@
 			showSearchResults.value = false;
 		}, 200); // 延迟200毫秒
 	};
-	
+
 	// 初始化用户信息
-	const inituser=()=>{
+	const inituser = () => {
 		let user = sessionStorage.getItem("user");
 		try {
 			user = JSON.parse(user);
@@ -366,13 +409,14 @@
 			name.value = user.name;
 			sex.value = user.sex;
 			console.log("user: " + username.value + name.value + sex.value);
+			myuser.value=user;
 		} catch (e) {
 			console.error("解析 user 失败：", e);
 		}
 	}
-	
+
 	// 初始化实时数据
-	const initrealtime=()=>{
+	const initrealtime = () => {
 		api({
 			url: '/conversation/realtime',
 			method: 'get'
@@ -391,13 +435,13 @@
 			url: '/conversation/getself',
 			method: 'get'
 		}).then(response => {
-			console.log(response)
+			console.log(1)
 			chatListItems.value = response;
+
 			console.log(chatListItems.value)
 		}).catch(error => {
 			// 失败处理
 			console.error('获取聊天列表失败:', error)
-			alert('获取聊天列表失败: ' + (error.msg || error.message || '未知错误'))
 		})
 	}
 
@@ -419,7 +463,7 @@
 			initchatlist();
 		}).catch(error => {
 			// 失败处理
-			ElMessage.error('删除会话失败:'+ JSON.stringify(error))
+			ElMessage.error('删除会话失败:' + JSON.stringify(error))
 		})
 	}
 
@@ -442,7 +486,7 @@
 			initchatlist();
 		}).catch(error => {
 			// 失败处理
-			ElMessage.error('创建群聊失败:'+ JSON.stringify(error))
+			ElMessage.error('创建群聊失败:' + JSON.stringify(error))
 		})
 	}
 
@@ -462,11 +506,11 @@
 				initchatlist();
 			}).catch(error => {
 				// 失败处理
-				ElMessage.error('加入群聊失败:'+ JSON.stringify(error))
+				ElMessage.error('加入群聊失败:' + JSON.stringify(error))
 			})
 		} else if (type.value == 0) {
 			// 查询用户接口查到用创建会话接口
-			loadUserData(1,10,key.value);
+			loadUserData(1, 10, key.value);
 		}
 	}
 
@@ -491,7 +535,7 @@
 			}
 		}).catch(error => {
 			// 失败处理
-			ElMessage.error('修改信息失败:'+ JSON.stringify(error))
+			ElMessage.error('修改信息失败:' + JSON.stringify(error))
 		})
 	}
 
@@ -518,17 +562,23 @@
 
 	// 注册 mounted 钩子，DOM 挂载后自动执行
 	onMounted(() => {
-	  inituser();
-	  initrealtime();
-	  initchatlist();
+		inituser();
+		initrealtime();
+		initchatlist();
 	});
 </script>
 
 <style scoped>
-	@import url("../css/components-chat/chat-selfbox.css");
+	/* 添加群聊样式 */
 	@import url("../css/components-chat/chat-groupbox.css");
+	/* 修改个人信息样式 */
+	@import url("../css/components-chat/chat-selfbox.css");
+	/* 实时搜素样式 */
 	@import url("../css/components-chat/chat-realtime.css");
+	/* 选择用户私聊样式 */
 	@import url("../css/components-chat/chat-selectuser.css");
+	/* 消息列表样式 */
+	@import url("../css/components-chat/chat-main.css");
 
 	/* 定义辉光颜色变量 */
 	:root {
@@ -689,13 +739,6 @@
 		padding-left: 17px;
 	}
 
-	/* 	.chat-list-item .avatar {
-		width: 50px;
-		height: 50px;
-		border-radius: 50%;
-		margin-right: 15px;
-	} */
-
 	.chat-info {
 		width: 100%;
 		display: flex;
@@ -791,105 +834,7 @@
 		text-shadow: 0 0 8px var(--glow-cyan), 0 0 15px var(--glow-cyan);
 	}
 
-	/* --- 消息区域 (样式与之前版本相同) --- */
-	.chat-messages {
-		flex-grow: 1;
-		padding: 20px;
-		overflow-y: auto;
-		display: flex;
-		flex-direction: column;
-		gap: 20px;
-	}
 
-	.chat-messages::-webkit-scrollbar {
-		width: 6px;
-	}
-
-	.chat-messages::-webkit-scrollbar-track {
-		background: transparent;
-	}
-
-	.chat-messages::-webkit-scrollbar-thumb {
-		background-color: var(--glow-cyan);
-		border-radius: 10px;
-	}
-
-	.time-separator {
-		text-align: center;
-		font-size: 12px;
-		color: #888;
-		margin-bottom: 10px;
-	}
-
-	.message-wrapper {
-		display: flex;
-		gap: 10px;
-		max-width: 70%;
-	}
-
-	.avatar {
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-		border: 1px solid rgba(0, 255, 156, 0.3);
-	}
-
-	.message-content {
-		display: flex;
-		flex-direction: column;
-	}
-
-	.message-bubble {
-		padding: 10px 15px;
-		border-radius: 15px;
-		font-size: 14px;
-	}
-
-	.message-sender {
-		font-size: 13px;
-		color: #ccc;
-		margin-bottom: 5px;
-	}
-
-	.message-timestamp {
-		font-size: 10px;
-		color: #777;
-		margin-top: 5px;
-	}
-
-	.message-wrapper.received {
-		align-self: flex-start;
-	}
-
-	.message-wrapper.received .message-bubble {
-		background-color: rgba(30, 45, 40, 0.8);
-		border-top-left-radius: 0;
-	}
-
-	.message-wrapper.received .message-timestamp {
-		align-self: flex-start;
-	}
-
-	.message-wrapper.sent {
-		align-self: flex-end;
-		flex-direction: row-reverse;
-	}
-
-	.message-wrapper.sent .message-content {
-		align-items: flex-end;
-	}
-
-	.message-wrapper.sent .message-bubble {
-		background-color: var(--glow-green);
-		color: #000;
-		font-weight: 500;
-		border-top-right-radius: 0;
-		box-shadow: 0 0 8px var(--glow-green), 0 0 15px rgba(0, 255, 156, 0.7);
-	}
-
-	.message-wrapper.sent .message-timestamp {
-		align-self: flex-end;
-	}
 
 	/* --- 底部输入区 (样式与之前版本相同) --- */
 	.chat-footer {

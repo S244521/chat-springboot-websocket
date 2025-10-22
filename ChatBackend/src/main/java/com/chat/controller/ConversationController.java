@@ -105,7 +105,7 @@ public class ConversationController {
                 List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
 
                 // 更新redis缓存
-                redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
+                 redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);
                 redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
                 return Result.ok("创建会话成功");
             }
@@ -289,6 +289,7 @@ public class ConversationController {
         }
 
         List<ConversationVo> conversationListSelf = conversationService.getConversationListSelf(userIdStr);
+        conversationListSelf.forEach(System.out::println);
 
         // 存入redis
         redisTemplate.opsForValue().set("conversation:" + userId+":"+username, conversationListSelf);

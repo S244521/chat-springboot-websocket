@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -93,7 +94,9 @@ public class ConversationServiceImpl extends ServiceImpl<ConversationMapper, Con
                 conversationVo.setUsers(userList);
             }
             return conversationVo;
-        }).toList();
+        })
+        .filter(Objects::nonNull) // 关键：过滤掉所有null元素
+        .toList();
         return conversationVos;
     }
 }
