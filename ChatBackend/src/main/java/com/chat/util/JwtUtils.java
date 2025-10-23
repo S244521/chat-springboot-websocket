@@ -115,36 +115,9 @@ public class JwtUtils {
     public static void main(String[] args) {
         // 获取当前时间
         LocalDateTime now = LocalDateTime.now();
-        System.out.println("Bearer "+generateToken("root", 1L, "智哥", now));
+        String token = JwtUtils.generateToken("root", 1L,"伤", now);
 
-        long nowMillis = System.currentTimeMillis();
-        Date now1 = new Date(nowMillis);
-        Date exp = new Date(nowMillis + EXPIRATION_TIME);
-
-        LocalDateTime createdAt= LocalDateTime.now();
-
-        String token = Jwts.builder()
-                .setSubject("智哥")
-                .claim("userId", "1")
-                .claim("name", "1")
-                .claim("createdAt", createdAt.toString())
-                .setIssuedAt(now1)
-                .setExpiration(exp)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-        System.out.println("token: "+token);
-
-        Claims body = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
-        System.out.println("解析数据："+ body);
-        System.out.println("解析数据："+ body.get("userId"));
-        System.out.println("解析数据："+ body.get("name"));
-        System.out.println("解析数据："+ body.get("createdAt"));
-        System.out.println("解析数据："+ body.getSubject());
+        System.out.println("Shang "+token);
     }
 
 }

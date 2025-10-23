@@ -2,7 +2,7 @@ package com.chat.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.chat.Vo.UserVo;
+import com.chat.vo.UserVo;
 import com.chat.entity.UserEntity;
 
 import java.util.List;

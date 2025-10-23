@@ -22,7 +22,8 @@ public class FileServiceImpl extends ServiceImpl<FileMapper, FileEntity> impleme
         queryWrapper.like(fileQuery.getFilename() != null, "filename", fileQuery.getFilename());
         queryWrapper.ge(fileQuery.getStartTime() != null, "uploadtime", fileQuery.getStartTime());
         queryWrapper.le(fileQuery.getEndTime() != null, "uploadtime", fileQuery.getEndTime());
-        if(fileQuery.getIsNum()){
+        // 判断是否不为空且为true
+        if (fileQuery.getIsNum() != null && fileQuery.getIsNum()){
             queryWrapper.orderByDesc("num");
         }
         Page<FileEntity> re = page(page, queryWrapper);

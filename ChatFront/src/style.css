@@ -1,0 +1,4 @@
+	html, body {
+	  height: 100%; /* 让 html 和 body 占满视口高度 */
+	  overflow: hidden; /* 禁止 body 层面的滚动条 */
+	}

@@ -1,7 +1,9 @@
 <template>
+	<RootLogin/>
 </template>
 
-<script>
+<script setup>
+	import RootLogin from "../components/RootLogin.vue";
 </script>
 
 <style>

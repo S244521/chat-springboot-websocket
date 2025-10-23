@@ -11,7 +11,7 @@
  Target Server Version : 80037 (8.0.37)
  File Encoding         : 65001
 
- Date: 22/10/2025 19:00:27
+ Date: 23/10/2025 17:51:46
 */
 
 SET NAMES utf8mb4;
@@ -53,15 +53,20 @@ CREATE TABLE `file`  (
   `uploadtime` datetime NULL DEFAULT NULL COMMENT '上传时间',
   `num` int NULL DEFAULT 0 COMMENT '下载次数',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '文件资源表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '文件资源表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of file
 -- ----------------------------
-INSERT INTO `file` VALUES (1, 'chat.sql', 'http://localhost:9999/file/download/6ab7d10a-d0d8-474f-96cb-9a88c2b52ffe.sql', '2025-10-21 13:39:27', 0);
-INSERT INTO `file` VALUES (2, 'java后端陶怀智简历.pdf', 'http://localhost:9999/file/download/45916505-85cf-4061-8fd0-8ef60d0b8059.pdf', '2025-10-21 13:39:46', 0);
-INSERT INTO `file` VALUES (3, 'java面试.md', 'http://localhost:9999/file/download/d58c71d8-c820-44ec-9644-1fed96780585.md', '2025-10-21 13:39:55', 0);
-INSERT INTO `file` VALUES (4, 'spring面试题.md', 'http://localhost:9999/file/download/f3ec86be-98ea-4e50-aa0c-a5eb03bddf31.md', '2025-10-21 13:40:02', 0);
+INSERT INTO `file` VALUES (3, 'java面试.md', 'http://localhost:9999/file/download/d58c71d8-c820-44ec-9644-1fed96780585.md', '2025-10-21 13:39:55', 1);
+INSERT INTO `file` VALUES (4, 'spring面试题.md', 'http://localhost:9999/file/download/f3ec86be-98ea-4e50-aa0c-a5eb03bddf31.md', '2025-10-21 13:40:02', 1);
+INSERT INTO `file` VALUES (5, '【哲风壁纸】二次元-原神-水中.png', 'http://localhost:9999/file/download/83638bc9-d4d9-4546-b10b-f5f664499b84.png', '2025-10-23 10:49:52', 0);
+INSERT INTO `file` VALUES (8, 'apache-maven-3.8.7-bin.zip', 'http://localhost:9999/file/download/59a75db6-eabf-4eda-ae69-1327a6ee4609.zip', '2025-10-23 11:11:50', 1);
+INSERT INTO `file` VALUES (9, 'humanity.png', 'http://localhost:9999/file/download/32cf07d2-f334-441b-a0f2-e5f4dad5dfe5.png', '2025-10-23 11:16:04', 0);
+INSERT INTO `file` VALUES (10, 'b0d1d1ea3ba23995bf9cb405377c811f.jpeg', 'http://localhost:9999/file/download/66b3a989-985d-427b-a7cf-bed2e1a57d8d.jpeg', '2025-10-23 11:16:18', 0);
+INSERT INTO `file` VALUES (11, '21.png', 'http://localhost:9999/file/download/430bfd03-74a9-4225-bfa1-98d07ff5b374.png', '2025-10-23 11:16:24', 0);
+INSERT INTO `file` VALUES (12, '2(1).png', 'http://localhost:9999/file/download/49b438db-578b-46f4-a33e-c0124aa8bf9e.png', '2025-10-23 11:16:35', 0);
+INSERT INTO `file` VALUES (13, '005baa4a9bfc4ab7afff81382ceb338a~tplv-dy-aweme-images_q75.webp', 'http://localhost:9999/file/download/97b16a6d-a79f-46a4-8912-d07f23b49af6.webp', '2025-10-23 11:16:57', 0);
 
 -- ----------------------------
 -- Table structure for history

@@ -1,10 +1,9 @@
 package com.chat.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.chat.Vo.UserVo;
+import com.chat.vo.UserVo;
 import com.chat.entity.UserEntity;
 import com.chat.mapper.UserMapper;
 import com.chat.service.UserService;

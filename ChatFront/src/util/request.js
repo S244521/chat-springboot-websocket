@@ -11,10 +11,17 @@ request.interceptors.request.use(
 	config => {
 		// 从本地存储获取 token（登录后存储）
 		const token = localStorage.getItem('token')
+		const root =localStorage.getItem('Root')
 		if (token && config.headers) {
 			// 统一设置 Authorization 请求头（除登录接口外）
-			if (config.url !== '/login') {
+			if (config.url !== '/user/login') {
 				config.headers.Authorization = token
+			}
+		}
+		if (root && config.headers) {
+			// 统一设置 Authorization 请求头（除登录接口外）
+			if (config.url == '/file/deleteFileById') {
+				config.headers.Root = root
 			}
 		}
 		return config

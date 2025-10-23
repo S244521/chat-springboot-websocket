@@ -1,6 +1,7 @@
 package com.chat.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.chat.common.FileQuery;
@@ -173,6 +174,14 @@ public class FileController {
 
                 System.out.println("Downloading file: {} with content type: {}"+ filename+ contentType);
 
+                // 下载次数加一
+                UpdateWrapper<FileEntity> updateWrapper = new UpdateWrapper<>();
+                updateWrapper.like("fileurl", filename);
+
+                // 执行 num = num + 1 的自增操作（SQL层面直接更新，无需查询）
+                updateWrapper.setSql("num = num + 1");
+                fileService.update(updateWrapper);
+
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(contentType))
                         // Content-Disposition 使得浏览器提示下载而不是直接显示（对于某些类型如图片/PDF）
@@ -223,7 +232,7 @@ public class FileController {
      */
     @PostMapping("/deleteFileById")
     public Result<?> deleteFileById(
-            @RequestHeader("Shang") String authorizationHeader,
+            @RequestHeader("Root") String authorizationHeader,
             @RequestParam("fileId") Integer fileId
     ) throws IOException {
         // 校验 token（保持原有逻辑）

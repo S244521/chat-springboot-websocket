@@ -2,30 +2,25 @@ package com.chat.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.chat.Vo.ConversationVo;
+import com.chat.vo.ConversationVo;
 import com.chat.common.Result;
 import com.chat.entity.ConversationEntity;
 import com.chat.service.ConversationService;
 import com.chat.util.ConversationLockUtil;
 import com.chat.util.JwtUtils;
 import com.chat.util.StringUtil;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/conversation")

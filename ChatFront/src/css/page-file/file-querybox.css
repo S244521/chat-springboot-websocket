@@ -1,0 +1,150 @@
+/* 整体容器和背景 */
+.header-backend {
+	width: 100%;
+	height: 70px;
+	background-color: #f7f9fc;
+	/* 淡雅的背景色 */
+	padding: 20px;
+	border-radius: 8px;
+	/* 圆角 */
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	/* 轻微的阴影增加层次感 */
+	margin-bottom: 20px;
+}
+
+/* 搜索容器 - 使用Flexbox进行布局 */
+.search-container {
+	display: flex;
+	/* flex-wrap: wrap; */
+	/* 允许换行，适应不同屏幕宽度 */
+	align-items: center;
+	/* 垂直居中对齐 */
+	gap: 20px;
+	/* 项目之间的间距 */
+}
+
+/* 每一个搜索项 */
+.search-item {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	/* 标签和输入框之间的间距 */
+}
+
+/* 标签样式 */
+.search-label {
+	font-size: 14px;
+	color: #555;
+	/* 标签字体颜色 */
+	white-space: nowrap;
+	/* 防止标签换行 */
+}
+
+/* 输入框和下拉选择框的通用样式 */
+.search-input,
+.search-select {
+	height: 40px;
+	padding: 0 12px;
+	font-size: 14px;
+	border: 1px solid #dcdfe6;
+	/* 边框颜色 */
+	border-radius: 4px;
+	transition: border-color 0.2s, box-shadow 0.2s;
+	/* 添加过渡效果 */
+	outline: none;
+	/* 移除默认的蓝色轮廓 */
+	background-color: #fff;
+}
+
+/* 输入框和下拉选择框获得焦点时的样式 */
+.search-input:focus,
+.search-select:focus {
+	border-color: #409eff;
+	/* 边框变为主题色 */
+	box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+	/* 添加柔和的光晕效果 */
+}
+
+/* 时间选择器的特定样式 */
+.search-time {
+	min-width: 220px;
+	/* 保证日期和时间能完整显示 */
+	color: #606266;
+}
+
+/* 自定义时间选择器的图标（适用于WebKit内核浏览器） */
+.search-time::-webkit-calendar-picker-indicator {
+	cursor: pointer;
+	opacity: 0.7;
+}
+
+.search-time::-webkit-calendar-picker-indicator:hover {
+	opacity: 1;
+}
+
+/* 下拉选择框的美化 */
+.search-select {
+	-webkit-appearance: none;
+	/* 移除默认样式(Chrome, Safari) */
+	-moz-appearance: none;
+	/* 移除默认样式 (Firefox) */
+	appearance: none;
+	/* 移除默认样式 */
+	background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23606266%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+	background-repeat: no-repeat;
+	background-position: right 12px center;
+	background-size: 10px;
+	padding-right: 30px;
+	/* 为箭头图标留出空间 */
+}
+
+
+/* 按钮通用样式 */
+.search-btn,
+.reset-btn {
+	height: 40px;
+	padding: 0 20px;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: 4px;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+	outline: none;
+}
+
+/* 搜索按钮样式 */
+.search-btn {
+	background-color: #409eff;
+	/* 主题色 */
+	color: #fff;
+}
+
+.search-btn:hover {
+	background-color: #66b1ff;
+	box-shadow: 0 4px 12px rgba(64, 158, 255, 0.2);
+}
+
+.search-btn:active {
+	background-color: #3a8ee6;
+}
+
+
+/* 重置按钮样式 */
+.reset-btn {
+	background-color: #f0f2f5;
+	color: #606266;
+	border: 1px solid #dcdfe6;
+}
+
+.reset-btn:hover {
+	background-color: #e4e7ed;
+	color: #409eff;
+	border-color: #c6e2ff;
+}
+
+.reset-btn:active {
+	background-color: #dcdfe6;
+	border-color: #a6d5ff;
+}

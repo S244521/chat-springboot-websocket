@@ -121,7 +121,7 @@
 								<span class="chat-timestamp">{{ chat.timestamp }}</span>
 							</div>
 							<span class="search-icon" style="font-size: 24px;"
-								@click.stop="deleteById(chat.id)">🗑</span>
+								@click.stop="deleteById(chat.id)" title="退出聊天">🗑</span>
 							<!-- <p class="last-message">{{ chat.lastMessage }}</p> -->
 						</div>
 					</li>
@@ -140,8 +140,9 @@
 						</div>
 
 						<div class="chat-box">
-							<span class="search-icon" @click="showAddChatGroup=true">➕</span>
-							<span class="search-icon" @click="showChangeSelf=true">👤</span>
+							<span class="search-icon" style="font-size: 22px;color: aqua;margin-right: 5px;" @click="gotoroot" title="获取管理员权限" >♜</span>
+							<span class="search-icon" style="font-size: 20px;color: aqua;margin-right: 8px;" @click="showAddChatGroup=true" title="创建群聊">✚</span>
+							<span class="search-icon" style="font-size: 20px;color: aqua;" @click="showChangeSelf=true" title="修改个人信息">帥</span>
 						</div>
 					</div>
 				</header>
@@ -165,7 +166,7 @@
 				<footer class="chat-footer">
 					<input type="text" class="message-input" v-model="messageInput" placeholder="请输入消息..."
 						@keyup.enter="sendMessage" />
-					<span class="icon" @click="showAttachments = !showAttachments">📎</span>
+					<span class="icon" @click="gotofile" title="文件上传">📎</span>
 					<button class="send-button" @click="sendMessage">发送</button>
 				</footer>
 
@@ -340,6 +341,15 @@
 
 
 	//********************************常规函数*****************************//
+
+	const gotoroot = () => {
+		router.push('/Root');
+	}
+	
+	// 跳转file页面
+	const gotofile = () => {
+		router.push('/File');
+	}
 
 	// 点击用户项触发
 	const handleUserClick = (user) => {

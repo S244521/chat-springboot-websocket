@@ -1,7 +1,7 @@
 package com.chat.controller;
 
 
-import com.chat.Vo.HistoryVo;
+import com.chat.vo.HistoryVo;
 import com.chat.common.Result;
 import com.chat.entity.HistoryEntity;
 import com.chat.service.HistoryService;

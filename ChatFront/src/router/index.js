@@ -48,16 +48,16 @@ router.beforeEach((to, from, next) => {
 	}
 
 	// 3. 已登录，但要访问 /Root 页面 → 校验 shang 权限
-	if (to.path === '/Root') {
-		if (rootStr!=null&&rootStr.length>20) {// TODO 目前不定长没找到核对方法
-			next(); // 有权限，允许进入
-		} else {
-			// 无权限，可跳回首页或提示
-			next('/Chat'); // 或 next('/') 跳回登录页
-			alert('无权限访问该页面（需root权限）');
-		}
-		return; // 终止后续逻辑
-	}
+	// if (to.path === '/Root') {
+	// 	if (rootStr!=null&&rootStr.length>20) {// TODO 目前不定长没找到核对方法
+	// 		next(); // 有权限，允许进入
+	// 	} else {
+	// 		// 无权限，可跳回首页或提示
+	// 		next('/Chat'); // 或 next('/') 跳回登录页
+	// 		alert('无权限访问该页面（需root权限）');
+	// 	}
+	// 	return; // 终止后续逻辑
+	// }
 
 	// 4. 其他情况（已登录访问非Root页，或未登录访问登录页）→ 正常放行
 	next();

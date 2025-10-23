@@ -1,15 +1,11 @@
 package com.chat.controller;
 
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.chat.Vo.UserVo;
 import com.chat.common.Result;
 import com.chat.entity.RootEntity;
-import com.chat.entity.UserEntity;
 import com.chat.service.RootService;
 import com.chat.service.UserService;
 import com.chat.util.JwtUtils;
-import com.chat.util.SHA256Util;
 import com.chat.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

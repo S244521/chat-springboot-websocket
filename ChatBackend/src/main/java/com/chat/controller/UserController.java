@@ -2,7 +2,7 @@ package com.chat.controller;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.chat.Vo.UserVo;
+import com.chat.vo.UserVo;
 import com.chat.entity.UserEntity;
 import com.chat.service.UserService;
 import com.chat.common.Result;
