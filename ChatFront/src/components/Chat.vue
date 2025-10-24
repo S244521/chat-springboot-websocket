@@ -540,6 +540,7 @@
 			ElMessage.success('创建群聊成功');
 			// 重新获取数据
 			initchatlist();
+			initrealtime();
 		}).catch(error => {
 			// 失败处理
 			ElMessage.error('创建群聊失败:' + JSON.stringify(error))

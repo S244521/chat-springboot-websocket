@@ -1,7 +1,10 @@
 package com.chat.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.chat.entity.HistoryEntity;
+import com.chat.service.HistoryService;
 import com.chat.vo.ConversationVo;
 import com.chat.common.Result;
 import com.chat.entity.ConversationEntity;
@@ -31,6 +34,9 @@ public class ConversationController {
 
     @Autowired
     private PlatformTransactionManager transactionManager;
+
+    @Autowired
+    private HistoryService historyService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -223,6 +229,36 @@ public class ConversationController {
 
             // 2. 业务逻辑（查询→修改→更新）
             ConversationEntity conversation = conversationService.getById(conversationId);
+
+            // 校验会话是否是单聊直接删除
+            if (conversation == null || conversation.getType() != 0) {
+                // 判断是否是有自己的id
+                List<ConversationEntity> list = conversationService.query()
+                        .eq("id", conversationId)
+                        .eq("type", 0)
+                        .and(q -> q
+                                .or()
+                                .eq("conversation", String.valueOf(userIntId)) // 精确等于 id
+                                .or()
+                                .likeRight("conversation", userIntId + ",") // 以 id, 开头（如 123,xxx）
+                                .or()
+                                .likeLeft("conversation", "," + userIntId) // 以 ,id 结尾（如 xxx,123）
+                        ).list();
+                if(list.size() == 0){
+                    return Result.error("退出失败，是不你的会话");
+                }
+                else if(list.size() == 1){
+                    QueryWrapper<HistoryEntity> queryWrapper = new QueryWrapper<>();
+                    queryWrapper.eq("conversation_id", conversationId);
+                    historyService.remove(queryWrapper);
+                    conversationService.removeById(conversationId);
+                    return Result.ok("退出成功");
+                }
+                else{
+                    return Result.error("数据库有问题，暂不删除");
+                }
+
+            }
 
             // ... 处理成员列表 ...
             Set<Integer> split = StringUtil.split(conversation.getConversation());

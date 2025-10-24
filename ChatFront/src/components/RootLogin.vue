@@ -1,4 +1,5 @@
 <template>
+	<div class="back-button" @click="gotoChat">⮌️</div>
 	<div class="login-container">
 		<canvas ref="canvasRef" class="background-canvas"></canvas>
 
@@ -48,7 +49,10 @@
 	const loginFormRef = ref()
 	const canvasRef = ref()
 
-
+	const gotoChat = () => {
+		router.push("/Chat")
+	}
+	
 	const loginForm = ref({
 		username: '',
 		password: ''
@@ -722,5 +726,31 @@
 			font-weight: 500;
 			text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 		}
+	}
+	
+	
+	.back-button {
+		position: fixed;
+		right: 50px;
+		bottom: 40px;
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		background-color: #59aefa;
+		font-size: 30px;
+		color: white;
+		border: none;
+		cursor: pointer;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+		display: flex;
+		/* align-items: center; */
+		justify-content: center;
+		transition: all 0.3s ease;
+		z-index: 100;
+	}
+	
+	.back-button:hover {
+		background-color: #aab0ff;
+		transform: scale(1.1);
 	}
 </style>

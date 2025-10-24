@@ -11,7 +11,7 @@
  Target Server Version : 80037 (8.0.37)
  File Encoding         : 65001
 
- Date: 23/10/2025 17:51:46
+ Date: 24/10/2025 18:28:57
 */
 
 SET NAMES utf8mb4;
@@ -32,15 +32,18 @@ CREATE TABLE `conversation`  (
 -- ----------------------------
 -- Records of conversation
 -- ----------------------------
-INSERT INTO `conversation` VALUES ('13f695a9f2bc4687838cda95351efd47', NULL, 0, '9');
 INSERT INTO `conversation` VALUES ('1be2d03e94874adfacc162d1c8d4428c', '深夜树洞', 1, '1,9');
 INSERT INTO `conversation` VALUES ('3029bbc5b00e4a37b5cb8be3fcbbc331', '天地一家大爱盟', 1, '1,5,7');
 INSERT INTO `conversation` VALUES ('37241dbb8bda4766b2e5686674c87e4e', NULL, 0, '5,7');
 INSERT INTO `conversation` VALUES ('43f2b4b766114a51b21aacf87dbe3033', '智哥搞事情', 1, '1,9');
+INSERT INTO `conversation` VALUES ('48496c77ddea4c9eb9fbe7461f03b66f', '搞毛呀', 1, '1');
+INSERT INTO `conversation` VALUES ('67beac80550e49409f92d5b919334698', NULL, 0, '1,5');
+INSERT INTO `conversation` VALUES ('7b59b7c3d56a413387f2e867de8f233c', NULL, 0, '1,4');
 INSERT INTO `conversation` VALUES ('80f8c269c946438186a25097752ea4d0', NULL, 0, '7,9');
 INSERT INTO `conversation` VALUES ('823e2259c4054927b4835f7ec270af89', NULL, 0, '9,14');
 INSERT INTO `conversation` VALUES ('975041d8220d49c48516c61732b4fceb', '智哥悄悄话', 1, '1');
-INSERT INTO `conversation` VALUES ('e903e4d7473f4e68b84a2b462a9c3401', NULL, 0, '5');
+INSERT INTO `conversation` VALUES ('bd42f35acd44402b98476cd8901822c9', '摸摸鱼', 1, '1');
+INSERT INTO `conversation` VALUES ('d8b0566895204eaaacc956464b6586a5', '搞事情', 1, '');
 
 -- ----------------------------
 -- Table structure for file
@@ -80,7 +83,7 @@ CREATE TABLE `history`  (
   `createtime` datetime NULL DEFAULT NULL COMMENT '发送时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_message_conversationid`(`conversationid` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '聊天记录表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '聊天记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of history
@@ -95,6 +98,8 @@ INSERT INTO `history` VALUES (7, 5, '3029bbc5b00e4a37b5cb8be3fcbbc331', '你好�
 INSERT INTO `history` VALUES (8, 7, '3029bbc5b00e4a37b5cb8be3fcbbc331', 'yyds', '2025-10-22 18:38:58');
 INSERT INTO `history` VALUES (9, 7, '37241dbb8bda4766b2e5686674c87e4e', '你好', '2025-10-22 18:44:01');
 INSERT INTO `history` VALUES (10, 1, '3029bbc5b00e4a37b5cb8be3fcbbc331', '666', '2025-10-22 18:44:50');
+INSERT INTO `history` VALUES (11, 1, '67beac80550e49409f92d5b919334698', '你好的', '2025-10-24 18:21:41');
+INSERT INTO `history` VALUES (12, 5, '67beac80550e49409f92d5b919334698', '貌似', '2025-10-24 18:21:47');
 
 -- ----------------------------
 -- Table structure for root
