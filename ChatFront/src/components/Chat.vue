@@ -776,6 +776,19 @@
 		overflow-y: auto;
 		flex-grow: 1;
 	}
+	
+	.chat-list::-webkit-scrollbar {
+		width: 6px;
+	}
+	
+	.chat-list::-webkit-scrollbar-track {
+		background: transparent;
+	}
+	
+	.chat-list::-webkit-scrollbar-thumb {
+		background-color: #066065; /* 原 --glow-cyan */
+		border-radius: 10px;
+	}
 
 	.chat-list-item {
 		display: flex;

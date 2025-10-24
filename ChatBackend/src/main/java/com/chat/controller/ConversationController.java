@@ -230,14 +230,16 @@ public class ConversationController {
             // 2. 业务逻辑（查询→修改→更新）
             ConversationEntity conversation = conversationService.getById(conversationId);
 
-            // 校验会话是否是单聊直接删除
-            if (conversation == null || conversation.getType() != 0) {
+            if (conversation == null){
+                return Result.error("退出失败，请检查会话ID是否正确");
+            }
+            // 校验会话是否是单聊
+            if ( conversation.getType() == 0) {
                 // 判断是否是有自己的id
                 List<ConversationEntity> list = conversationService.query()
                         .eq("id", conversationId)
                         .eq("type", 0)
                         .and(q -> q
-                                .or()
                                 .eq("conversation", String.valueOf(userIntId)) // 精确等于 id
                                 .or()
                                 .likeRight("conversation", userIntId + ",") // 以 id, 开头（如 123,xxx）
