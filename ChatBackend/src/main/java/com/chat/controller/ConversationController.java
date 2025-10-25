@@ -41,6 +41,7 @@ public class ConversationController {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+
     /**
      * 建立会话
      * @param
@@ -235,6 +236,7 @@ public class ConversationController {
             }
             // 校验会话是否是单聊
             if ( conversation.getType() == 0) {
+                System.out.println("单聊");
                 // 判断是否是有自己的id
                 List<ConversationEntity> list = conversationService.query()
                         .eq("id", conversationId)
@@ -251,9 +253,10 @@ public class ConversationController {
                 }
                 else if(list.size() == 1){
                     QueryWrapper<HistoryEntity> queryWrapper = new QueryWrapper<>();
-                    queryWrapper.eq("conversation_id", conversationId);
+                    queryWrapper.eq("conversationid", conversationId);
                     historyService.remove(queryWrapper);
                     conversationService.removeById(conversationId);
+                    transactionManager.commit(status);
                     return Result.ok("退出成功");
                 }
                 else{
@@ -281,8 +284,10 @@ public class ConversationController {
 //            redisTemplate.expire("conversation:" + userId+":"+username, 1, TimeUnit.DAYS);
             return Result.ok("退出成功");
         } catch (Exception e){
+            // 输入异常情况
+            System.out.println("异常情况："+e);
             transactionManager.rollback(status);
-            return Result.error("失败");
+            return Result.error(e.getMessage());
         } finally {
             memberLock.unlock();// 事务提交/回滚后再释放锁
         }

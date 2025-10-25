@@ -59,3 +59,36 @@
 
 此模块是所有用户贡献相当于是资源分享平台，上传前最好备注一下文件名让人一看就看的懂
 <img src=".\img\image-20251024191550971.png" alt="image-20251024191550971"  />
+
+
+
+
+
+### 部署
+
+解决刷新nginx404的问题
+
+```
+# 核心配置：处理 Vue Router History 模式（添加这部分）
+location / {
+    # 尝试访问真实文件/目录，不存在则转发到 index.html
+    try_files $uri $uri/ /index.html;
+}
+```
+
+宝塔配置html项目dist需要重新配置代理
+
+```
+location /backend {
+    proxy_pass http://localhost:9999;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    rewrite ^/backend(.*)$ $1 break; # 移除请求路径中的/backend前缀
+    # 支持WebSocket（如果需要）
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+}
+```
+
