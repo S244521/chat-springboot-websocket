@@ -25,22 +25,39 @@
 	import gsap from 'gsap';
 
 	// 定义要显示的文字
-	// const textContent = ref("animate text trail effect".split('')); //0.6
 	const textContent = ref("欢迎来到，智哥聊天室".split(''));
 
 	// 鼠标移动事件处理函数
 	const handleMouseMove = (e) => {
+		// e.clientX 和 e.clientY 就是鼠标相对于浏览器视口的坐标
+		// 我们直接使用这个坐标，GSAP会处理元素的定位
 		gsap.to(".text", {
-			x: e.clientX-695,
-			y: e.clientY-192,
-			stagger: 0.1, // 每个字符之间的动画延迟，形成拖尾效果
-			duration: 0.5, // 稍微增加一点持续时间让效果更柔和（可选）
-			ease: "back.out(1.7)" // 添加一个缓动效果让动画更生动（可选）
+			x: e.clientX + 35,
+			y: e.clientY - 10,
+			stagger: 0.05, // 可以稍微调整延迟，让跟随更紧密或更松散
+			duration: 0.5,
+			ease: "power2.out" // 换一个更平滑的缓动函数
 		});
 	};
 
-	// 组件挂载完成后
 	onMounted(() => {
+		// --- 新增代码：设置文字的初始位置 ---
+
+		// 1. 计算视口的中心点 X 坐标
+		const initialX = window.innerWidth / 2-170;
+		// 2. 计算视口顶部向下 15% 的 Y 坐标
+		const initialY = window.innerHeight * 0.15;
+
+		// 3. 使用 gsap.set() 立即将所有 .text 元素放置到计算出的初始位置
+		//    这里加上 handleMouseMove 中的偏移量，是为了让初始效果和跟随效果的对齐方式保持一致
+		gsap.set(".text", {
+			x: initialX + 35,
+			y: initialY - 10,
+		});
+
+		// --- 结束新增代码 ---
+
+
 		// 监听整个窗口的鼠标移动
 		window.addEventListener("mousemove", handleMouseMove);
 	});
@@ -72,38 +89,24 @@
 	}
 
 	.cursor {
-		/* 		position: absolute;
-		top: 0;
-		left: 20px;
-		pointer-events: none; */
-
-		position: absolute;
-		top: 20%;
-		left: 42%;
-		transform: translateX(-50%);
+		/* 
+		 * 移除 position: absolute 和 top/left/transform
+		 * .text 元素将直接通过 GSAP 的 transform 来定位
+		 */
 		pointer-events: none;
 	}
 
 	.cursor .text {
-		/* 		background-color: antiquewhite;
-		position: absolute;
+		position: fixed;
+		/* 使用 fixed 定位，使其相对于视口 */
+		top: 0;
+		left: 0;
 		font-size: 2em;
 		color: #00ff9a;
 		text-shadow: 0 0 15px #00ff9a, 0 0 50px #00ff9a;
 		text-transform: uppercase;
-		display: flex;
-		justify-content: center;
-		align-items: center; */
 
-
-		position: absolute;
-		font-size: 2em;
-		color: #00ff9a;
-		text-shadow: 0 0 15px #00ff9a, 0 0 50px #00ff9a;
-		text-transform: uppercase;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		
+		/* 关键：通过 transform 将元素的中心点对准鼠标 */
+		transform: translate(-50%, -50%);
 	}
 </style>
